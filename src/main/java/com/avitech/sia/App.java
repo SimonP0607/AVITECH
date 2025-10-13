@@ -10,6 +10,10 @@ import java.io.IOException;
 public class App extends Application {
     private static Stage primaryStage;
 
+    public static Stage PrimaryStage() {
+        return primaryStage;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         // Cargar fuentes (asegúrate de tenerlas en resources/fonts/)

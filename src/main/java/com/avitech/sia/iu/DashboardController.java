@@ -57,7 +57,7 @@ public class DashboardController {
     /* ======== NAV (stubs) ======== */
     @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
     @FXML private void goSupplies()   { App.goTo("/fxml/supplies.fxml", "SIA Avitech — Suministros"); }
-    @FXML private void goHealth()     { markActive("Sanidad"); }
+    @FXML private void goHealth()     { App.goTo("/fxml/sanidad.fxml", "SIA Avitech — Sanidad"); }
     @FXML private void goProduction() { markActive("Producción"); }
     @FXML private void goReports()    { markActive("Reportes"); }
     @FXML private void goAlerts()     { markActive("Alertas"); }
