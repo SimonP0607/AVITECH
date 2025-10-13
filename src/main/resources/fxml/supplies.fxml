@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.avitech.sia.iu.SuppliesController"
+            prefWidth="1280" prefHeight="800">
+
+    <!-- ===== SIDEBAR ===== -->
+    <left>
+        <ScrollPane fx:id="spMenu"
+                    fitToWidth="true" fitToHeight="false"
+                    vbarPolicy="AS_NEEDED" hbarPolicy="NEVER"
+                    pannable="true" prefWidth="270"
+                    styleClass="side-scroll">
+            <content>
+                <VBox fx:id="sidebar" spacing="10" styleClass="sidebar"
+                      minWidth="270" prefWidth="270" maxWidth="270"
+                      fillWidth="true">
+                    <children>
+                        <Label text="Menú Principal" styleClass="sidebar-title"/>
+
+                        <fx:define>
+                            <ToggleGroup fx:id="sideGroup"/>
+                        </fx:define>
+
+                        <ToggleButton text="Tablero"       toggleGroup="$sideGroup" onAction="#goDashboard"  styleClass="side-btn"/>
+                        <ToggleButton text="Suministros"   toggleGroup="$sideGroup" onAction="#goSupplies"   styleClass="side-btn active"/>
+                        <ToggleButton text="Sanidad"       toggleGroup="$sideGroup" onAction="#goHealth"     styleClass="side-btn"/>
+                        <ToggleButton text="Producción"    toggleGroup="$sideGroup" onAction="#goProduction" styleClass="side-btn"/>
+                        <ToggleButton text="Reportes"      toggleGroup="$sideGroup" onAction="#goReports"    styleClass="side-btn"/>
+                        <ToggleButton text="Alertas"       toggleGroup="$sideGroup" onAction="#goAlerts"     styleClass="side-btn"/>
+                        <ToggleButton text="Auditoría"     toggleGroup="$sideGroup" onAction="#goAudit"      styleClass="side-btn"/>
+                        <ToggleButton text="Parámetros"    toggleGroup="$sideGroup" onAction="#goParams"     styleClass="side-btn"/>
+                        <ToggleButton text="Usuarios"      toggleGroup="$sideGroup" onAction="#goUsers"      styleClass="side-btn"/>
+                        <ToggleButton text="Respaldos"     toggleGroup="$sideGroup" onAction="#goBackup"     styleClass="side-btn"/>
+
+                        <Region VBox.vgrow="ALWAYS"/>
+
+                        <Label text="Usuario del sistema" styleClass="sidebar-subtitle"/>
+                        <Label text="Administrador" styleClass="sidebar-user"/>
+                        <Button text="Cerrar sesión" onAction="#onExit" styleClass="side-logout"/>
+                    </children>
+
+                    <padding>
+                        <Insets top="16" right="16" bottom="16" left="16"/>
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </left>
+
+    <!-- ===== TOP BAR ===== -->
+    <top>
+        <HBox spacing="12" styleClass="topbar">
+            <children>
+                <Label text="AVITECH — SIA" styleClass="topbar-brand"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Label text="Sistema Offline — MySQL Local" styleClass="topbar-status"/>
+                <Separator orientation="VERTICAL"/>
+                <Label text="Administrador"/>
+                <Button text="↩ Salir" onAction="#onExit" styleClass="ghostBtn"/>
+            </children>
+            <padding><Insets topRightBottomLeft="10"/></padding>
+        </HBox>
+    </top>
+
+    <!-- ===== CONTENT ===== -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="false"
+                    vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED"
+                    pannable="true">
+            <content>
+                <VBox spacing="18" styleClass="content"
+                      fillWidth="true" maxWidth="Infinity">
+                    <children>
+                        <!-- Encabezado y acciones -->
+                        <VBox spacing="14">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Button text="↩ Volver" onAction="#goDashboard" styleClass="ghostBtn small"/>
+                                    <Pane HBox.hgrow="ALWAYS"/>
+                                    <HBox spacing="8">
+                                        <Button text="+ Entrada" styleClass="primary"/>
+                                        <Button text="Registrar salida" styleClass="secondary"/>
+                                        <Button text="Mover stock" styleClass="ghostBtn"/>
+                                    </HBox>
+                                </HBox>
+
+                                <HBox spacing="18">
+                                    <children>
+                                        <VBox spacing="16" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <VBox spacing="6">
+                                                    <Label text="Suministros y Alimentos" styleClass="h2"/>
+                                                    <Label text="Gestión de stock, entradas y salidas de productos" styleClass="helper"/>
+                                                </VBox>
+
+                                                <HBox spacing="12">
+                                                    <children>
+                                                        <VBox styleClass="card metric-card" spacing="8" minWidth="0" prefWidth="220">
+                                                            <children>
+                                                                <Label text="Movimientos Hoy" styleClass="metric-title"/>
+                                                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                                                    <Label text="0" styleClass="metric-value"/>
+                                                                    <Label text="Actualizado 14:32" styleClass="metric-helper"/>
+                                                                </HBox>
+                                                                <Label text="Sin movimientos registrados en el día." wrapText="true" styleClass="metric-helper"/>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <VBox styleClass="card metric-card" spacing="10" minWidth="0" prefWidth="220">
+                                                            <children>
+                                                                <Label text="Stock Bajo" styleClass="metric-title"/>
+                                                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                                                    <Label text="2" styleClass="metric-value critical"/>
+                                                                    <Label text="productos" styleClass="metric-helper"/>
+                                                                </HBox>
+                                                                <Label text="Reponer antes del fin de semana." wrapText="true" styleClass="metric-helper"/>
+                                                                <FlowPane hgap="6" vgap="6">
+                                                                    <children>
+                                                                        <Label text="Vitamina D" styleClass="badge critical"/>
+                                                                        <Label text="Calcio Premium" styleClass="badge warning"/>
+                                                                    </children>
+                                                                </FlowPane>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <VBox styleClass="card metric-card" spacing="10" minWidth="0" prefWidth="220">
+                                                            <children>
+                                                                <Label text="Solicitudes Pendientes" styleClass="metric-title"/>
+                                                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                                                    <Label text="3" styleClass="metric-value"/>
+                                                                    <Label text="movimientos" styleClass="metric-helper"/>
+                                                                </HBox>
+                                                                <Label text="Esperando aprobación del almacén." wrapText="true" styleClass="metric-helper"/>
+                                                                <Label text="Priorizar consumo de galpones." wrapText="true" styleClass="metric-helper"/>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox styleClass="card stock-card" spacing="14" prefWidth="320" minWidth="260">
+                                            <children>
+                                                <Label text="Valor Total Stock" styleClass="card-title"/>
+                                                <Label text="$2.339,05" styleClass="stock-value"/>
+                                                <Label text="Basado en costo promedio actualizado al día de hoy." wrapText="true" styleClass="muted"/>
+                                                <Separator/>
+                                                <VBox spacing="10">
+                                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                                        <Label text="Entradas" styleClass="badge success"/>
+                                                        <Label text="3 movimientos esta semana" styleClass="stock-meta"/>
+                                                    </HBox>
+                                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                                        <Label text="Salidas" styleClass="badge warning"/>
+                                                        <Label text="1 movimiento pendiente" styleClass="stock-meta"/>
+                                                    </HBox>
+                                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                                        <Label text="Críticos" styleClass="badge critical"/>
+                                                        <Label text="2 productos requieren reposición" styleClass="stock-meta"/>
+                                                    </HBox>
+                                                </VBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Filtros -->
+                        <VBox styleClass="card filter-card" spacing="18">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Filtros y Búsqueda" styleClass="card-title"/>
+                                    <Pane HBox.hgrow="ALWAYS"/>
+                                    <Button text="Limpiar filtros" styleClass="ghostBtn small"/>
+                                </HBox>
+
+                                <GridPane hgap="14" vgap="14">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                                    </columnConstraints>
+
+                                    <children>
+                                        <VBox spacing="6">
+                                            <Label text="Producto" styleClass="field-label"/>
+                                            <TextField promptText="Buscar por nombre o código" styleClass="input"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.columnIndex="1">
+                                            <Label text="Tipo de Movimiento" styleClass="field-label"/>
+                                            <ComboBox promptText="Seleccionar">
+                                                <items>
+                                                    <FXCollections fx:factory="observableArrayList">
+                                                        <String fx:value="Entradas"/>
+                                                        <String fx:value="Salidas"/>
+                                                        <String fx:value="Transferencias"/>
+                                                    </FXCollections>
+                                                </items>
+                                            </ComboBox>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.columnIndex="2">
+                                            <Label text="Destino" styleClass="field-label"/>
+                                            <ComboBox promptText="Todos los destinos">
+                                                <items>
+                                                    <FXCollections fx:factory="observableArrayList">
+                                                        <String fx:value="Almacén Principal"/>
+                                                        <String fx:value="Almacén Sanitario"/>
+                                                        <String fx:value="Galpones"/>
+                                                    </FXCollections>
+                                                </items>
+                                            </ComboBox>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.columnIndex="3">
+                                            <Label text="Responsable" styleClass="field-label"/>
+                                            <ComboBox promptText="Equipo completo">
+                                                <items>
+                                                    <FXCollections fx:factory="observableArrayList">
+                                                        <String fx:value="María García"/>
+                                                        <String fx:value="Carlos López"/>
+                                                        <String fx:value="Laura Pérez"/>
+                                                    </FXCollections>
+                                                </items>
+                                            </ComboBox>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="1">
+                                            <Label text="Desde" styleClass="field-label"/>
+                                            <DatePicker promptText="Fecha inicial"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label text="Hasta" styleClass="field-label"/>
+                                            <DatePicker promptText="Fecha final"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                                            <Label text="Etiquetas rápidas" styleClass="field-label"/>
+                                            <FlowPane hgap="8" vgap="8">
+                                                <children>
+                                                    <Label text="Stock bajo" styleClass="badge critical"/>
+                                                    <Label text="Vencimiento cercano" styleClass="badge warning"/>
+                                                    <Label text="Consumo regular" styleClass="badge info"/>
+                                                </children>
+                                            </FlowPane>
+                                        </VBox>
+
+                                        <HBox alignment="BOTTOM_RIGHT" spacing="8" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                            <Pane HBox.hgrow="ALWAYS"/>
+                                            <Button text="Aplicar filtros" styleClass="primary"/>
+                                        </HBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                        <!-- Historial -->
+                        <VBox styleClass="card" spacing="18">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <VBox spacing="4">
+                                        <Label text="Historial de Movimientos de Stock" styleClass="card-title"/>
+                                        <Label text="Entradas y salidas recientes de productos" styleClass="helper"/>
+                                    </VBox>
+                                    <Pane HBox.hgrow="ALWAYS"/>
+                                    <Button text="Exportar" styleClass="secondary"/>
+                                </HBox>
+
+                                <GridPane styleClass="movement-table">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="120" prefWidth="140" hgrow="SOMETIMES"/>
+                                        <ColumnConstraints minWidth="160" prefWidth="220" hgrow="ALWAYS"/>
+                                        <ColumnConstraints minWidth="140" prefWidth="160" hgrow="SOMETIMES"/>
+                                        <ColumnConstraints minWidth="100" prefWidth="110" hgrow="SOMETIMES"/>
+                                        <ColumnConstraints minWidth="140" prefWidth="160" hgrow="SOMETIMES"/>
+                                        <ColumnConstraints minWidth="150" prefWidth="170" hgrow="SOMETIMES"/>
+                                        <ColumnConstraints minWidth="170" prefWidth="190" hgrow="ALWAYS"/>
+                                    </columnConstraints>
+
+                                    <children>
+                                        <!-- Header -->
+                                        <Label text="Fecha" styleClass="table-header-cell"/>
+                                        <Label text="Producto" styleClass="table-header-cell" GridPane.columnIndex="1"/>
+                                        <Label text="Tipo" styleClass="table-header-cell" GridPane.columnIndex="2"/>
+                                        <Label text="Cantidad" styleClass="table-header-cell" GridPane.columnIndex="3"/>
+                                        <Label text="Responsable" styleClass="table-header-cell" GridPane.columnIndex="4"/>
+                                        <Label text="Destino" styleClass="table-header-cell" GridPane.columnIndex="5"/>
+                                        <Label text="Notas" styleClass="table-header-cell" GridPane.columnIndex="6"/>
+
+                                        <!-- Row 1 -->
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label text="2024-08-09"/>
+                                                <Label text="14:30" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label text="Concentrado Ponedoras"/>
+                                                <Label text="Lote #2023-11" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <HBox styleClass="table-cell" alignment="CENTER_LEFT" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                            <Label text="Salida" styleClass="badge warning"/>
+                                            <Label text="Consumo" styleClass="muted"/>
+                                        </HBox>
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label text="55 kg"/>
+                                                <Label text="Stock previo 1.780 kg" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <Label text="María García" styleClass="table-cell" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+                                        <Label text="Galpón Principal" styleClass="table-cell" GridPane.columnIndex="5" GridPane.rowIndex="1"/>
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.columnIndex="6" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label text="Motivo: Consumo Galpón A1"/>
+                                                <Label text="Entrega verificada" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Row 2 -->
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.rowIndex="2">
+                                            <children>
+                                                <Label text="2024-08-08"/>
+                                                <Label text="09:15" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                            <children>
+                                                <Label text="Vitamina D"/>
+                                                <Label text="Caja 12 frascos" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <HBox styleClass="table-cell" alignment="CENTER_LEFT" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                            <Label text="Entrada" styleClass="badge success"/>
+                                            <Label text="Proveedor" styleClass="muted"/>
+                                        </HBox>
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                            <children>
+                                                <Label text="36 und"/>
+                                                <Label text="Costo unitario $22,50" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <Label text="Carlos López" styleClass="table-cell" GridPane.columnIndex="4" GridPane.rowIndex="2"/>
+                                        <Label text="Almacén Principal" styleClass="table-cell" GridPane.columnIndex="5" GridPane.rowIndex="2"/>
+                                        <VBox styleClass="table-cell" spacing="4" GridPane.columnIndex="6" GridPane.rowIndex="2">
+                                            <children>
+                                                <Label text="Motivo: Reposición mensual"/>
+                                                <Label text="Factura #4521" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Row 3 -->
+                                        <VBox styleClass="table-cell last-row" spacing="4" GridPane.rowIndex="3">
+                                            <children>
+                                                <Label text="2024-08-07"/>
+                                                <Label text="16:45" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <VBox styleClass="table-cell last-row" spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                            <children>
+                                                <Label text="Calcio Premium"/>
+                                                <Label text="Sacos de 25 kg" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <HBox styleClass="table-cell last-row" alignment="CENTER_LEFT" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                            <Label text="Transferencia" styleClass="badge info"/>
+                                            <Label text="Entre almacenes" styleClass="muted"/>
+                                        </HBox>
+                                        <VBox styleClass="table-cell last-row" spacing="4" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                            <children>
+                                                <Label text="18 sacos"/>
+                                                <Label text="Stock previo 42 sacos" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                        <Label text="Laura Pérez" styleClass="table-cell last-row" GridPane.columnIndex="4" GridPane.rowIndex="3"/>
+                                        <Label text="Almacén Sanitario" styleClass="table-cell last-row" GridPane.columnIndex="5" GridPane.rowIndex="3"/>
+                                        <VBox styleClass="table-cell last-row" spacing="4" GridPane.columnIndex="6" GridPane.rowIndex="3">
+                                            <children>
+                                                <Label text="Motivo: Balance nutricional"/>
+                                                <Label text="Recibido por José Ruiz" styleClass="muted"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </children>
+
+                    <padding>
+                        <Insets top="24" right="24" bottom="36" left="24"/>
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
