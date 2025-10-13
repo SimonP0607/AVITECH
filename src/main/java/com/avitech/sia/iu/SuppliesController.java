@@ -24,11 +24,6 @@ public class SuppliesController {
     @FXML private void goUsers()      { markActive("Usuarios"); }
     @FXML private void goBackup()     { markActive("Respaldos"); }
 
-    @FXML
-    private void onExit() {
-        App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");
-    }
-
     private void markActive(String text) {
         if (sidebar == null) {
             return;
