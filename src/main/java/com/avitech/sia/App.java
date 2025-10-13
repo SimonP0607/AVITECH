@@ -38,13 +38,26 @@ public class App extends Application {
      */
     public static void goTo(String fxmlPath, String title) {
         try {
+            boolean wasMaximized = primaryStage.isMaximized();
+            double width = primaryStage.getWidth();
+            double height = primaryStage.getHeight();
+
             FXMLLoader loader = new FXMLLoader(App.class.getResource(fxmlPath));
             Scene scene = new Scene(loader.load());
             scene.getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
 
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
-            primaryStage.setMaximized(true);
+            if (wasMaximized) {
+                primaryStage.setMaximized(true);
+            } else {
+                if (!Double.isNaN(width) && width > 0) {
+                    primaryStage.setWidth(width);
+                }
+                if (!Double.isNaN(height) && height > 0) {
+                    primaryStage.setHeight(height);
+                }
+            }
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
