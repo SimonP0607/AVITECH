@@ -172,7 +172,7 @@
                                         </HBox>
                                         <Label text="Controla entradas, salidas y ajustes recientes del inventario." styleClass="helper" wrapText="true"/>
 
-                                        <TableView fx:id="tblMovimientos" prefHeight="320" columnResizePolicy="CONSTRAINED_RESIZE_POLICY" VBox.vgrow="ALWAYS">
+                                        <TableView fx:id="tblMovimientos" prefHeight="320" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" VBox.vgrow="ALWAYS">
                                             <columns>
                                                 <TableColumn fx:id="colFecha" text="Fecha" prefWidth="120"/>
                                                 <TableColumn fx:id="colProducto" text="Producto" prefWidth="160"/>
