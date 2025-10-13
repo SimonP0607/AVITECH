@@ -1,5 +1,6 @@
 package com.avitech.sia.iu;
 
+import com.avitech.sia.App;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -7,7 +8,6 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class DashboardController {
     // Topbar / user
@@ -51,12 +51,12 @@ public class DashboardController {
     }
 
     @FXML private void onExit() {
-        Stage st = (Stage) lblHeader.getScene().getWindow(); st.close();
+        App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");
     }
 
     /* ======== NAV (stubs) ======== */
-    @FXML private void goDashboard()  { markActive("Tablero"); }
-    @FXML private void goSupplies()   { markActive("Suministros"); }
+    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
+    @FXML private void goSupplies()   { App.goTo("/fxml/supplies.fxml", "SIA Avitech — Suministros"); }
     @FXML private void goHealth()     { markActive("Sanidad"); }
     @FXML private void goProduction() { markActive("Producción"); }
     @FXML private void goReports()    { markActive("Reportes"); }
