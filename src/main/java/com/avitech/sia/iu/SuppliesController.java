@@ -1,120 +1,62 @@
 package com.avitech.sia.iu;
 
-import javafx.beans.property.SimpleStringProperty;
+import com.avitech.sia.App;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.text.Text;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class SuppliesController {
-    // Topbar / user
-    @FXML private Label lblHeader;
-    @FXML private Label lblSystemStatus;
-    @FXML private Label lblUserInfo;
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-    // Cards
-    @FXML private VBox cardMovimientosHoy;
-    @FXML private VBox cardProductos;
-    @FXML private VBox cardStockBajo;
-    @FXML private VBox cardValorTotal;
-    @FXML private Label lblMovimientosHoy;
-    @FXML private Label lblProductos;
-    @FXML private Label lblStockBajo;
-    @FXML private Label lblValorTotal;
-
-    // Filters
-    @FXML private TextField txtBuscar;
-    @FXML private ComboBox<String> cbCategoria;
-    @FXML private DatePicker dpFecha;
-    @FXML private Button btnAplicarFiltros;
-    @FXML private Button btnLimpiarFiltros;
-
-    // Table
-    @FXML private TableView<Movimiento> tblMovimientos;
-    @FXML private TableColumn<Movimiento, String> colFecha;
-    @FXML private TableColumn<Movimiento, String> colTipo;
-    @FXML private TableColumn<Movimiento, String> colProducto;
-    @FXML private TableColumn<Movimiento, String> colCantidad;
-    @FXML private TableColumn<Movimiento, String> colResponsable;
-    @FXML private TableColumn<Movimiento, String> colNotas;
-
-    // Sidebar
     @FXML private VBox sidebar;
+    @FXML private Label lblResumenFecha;
+    @FXML private Label lblEstadoStock;
+    @FXML private Label lblStockDisponible;
+    @FXML private Label lblStockMeta;
+    @FXML private Label lblConsumoHoy;
+    @FXML private Label lblEntradasProgramadas;
+    @FXML private Label lblAlertasActivas;
+    @FXML private Label lblStockTotal;
+    @FXML private Label lblUltimoMovimiento;
+    @FXML private Label lblRecomendacion;
+    @FXML private TableView<StockMovement> tblMovimientos;
+    @FXML private TableColumn<StockMovement, String> colFecha;
+    @FXML private TableColumn<StockMovement, String> colProducto;
+    @FXML private TableColumn<StockMovement, String> colTipo;
+    @FXML private TableColumn<StockMovement, String> colCantidad;
+    @FXML private TableColumn<StockMovement, String> colUbicacion;
+    @FXML private TableColumn<StockMovement, String> colReferencia;
+    @FXML private ListView<String> lstAlertas;
+    @FXML private ComboBox<String> cbFiltroProducto;
+    @FXML private ComboBox<String> cbFiltroUbicacion;
+    @FXML private ComboBox<String> cbFiltroTipo;
+    @FXML private DatePicker dpFiltroDesde;
 
-    private final ObservableList<Movimiento> movimientos = FXCollections.observableArrayList();
+    private final ObservableList<StockMovement> movimientos = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
-        if (cbCategoria != null) {
-            cbCategoria.setItems(FXCollections.observableArrayList(
-                    "Alimentos",
-                    "Medicamentos",
-                    "Limpieza",
-                    "Equipamiento",
-                    "Otros"
-            ));
-        }
-
-        setupTable();
-        loadMock();
         markActive("Suministros");
+        configurarTablas();
+        configurarFiltros();
+        cargarDatosDemo();
     }
 
-    private void setupTable() {
-        if (colFecha != null) colFecha.setCellValueFactory(data -> data.getValue().fechaProperty());
-        if (colTipo != null) colTipo.setCellValueFactory(data -> data.getValue().tipoProperty());
-        if (colProducto != null) colProducto.setCellValueFactory(data -> data.getValue().productoProperty());
-        if (colCantidad != null) colCantidad.setCellValueFactory(data -> data.getValue().cantidadProperty());
-        if (colResponsable != null) colResponsable.setCellValueFactory(data -> data.getValue().responsableProperty());
-        if (colNotas != null) colNotas.setCellValueFactory(data -> data.getValue().notasProperty());
-
-        if (tblMovimientos != null) {
-            tblMovimientos.setItems(movimientos);
-        }
-    }
-
-    private void loadMock() {
-        if (lblSystemStatus != null) {
-            lblSystemStatus.setText("Sistema Online – MySQL Local");
-        }
-
-        if (lblMovimientosHoy != null) lblMovimientosHoy.setText("18 movimientos");
-        if (lblProductos != null) lblProductos.setText("85 productos");
-        if (lblStockBajo != null) lblStockBajo.setText("7 críticos");
-        if (lblValorTotal != null) lblValorTotal.setText("S/ 42,350");
-
-        movimientos.setAll(
-                new Movimiento("08:30", "Entrada", "Alimento balanceado", "+1,200 kg", "Juan Pérez", "Reposición semanal"),
-                new Movimiento("09:15", "Salida", "Desinfectante avícola", "-25 l", "María Ramos", "Limpieza galpón 4"),
-                new Movimiento("10:05", "Transferencia", "Maíz amarillo", "-450 kg", "Carlos Díaz", "A bodega secundaria"),
-                new Movimiento("11:40", "Entrada", "Vacuna Newcastle", "+350 dosis", "Proveedor VetFarm", "Lote 2024-09"),
-                new Movimiento("13:20", "Salida", "Vitaminas mixtas", "-80 frascos", "Lucía Méndez", "Programa nutricional"),
-                new Movimiento("14:05", "Transferencia", "Alimento iniciador", "-300 kg", "Juan Pérez", "Galpón recría"),
-                new Movimiento("15:30", "Entrada", "Camas de viruta", "+120 fardos", "Proveedor AgroSur", "Ingreso por compras"),
-                new Movimiento("16:10", "Salida", "Guantes sanitarios", "-200 pares", "María Ramos", "Reposición personal"),
-                new Movimiento("17:45", "Transferencia", "Alimento balanceado", "-600 kg", "Carlos Díaz", "Galpón postura"),
-                new Movimiento("18:30", "Entrada", "Suplemento calcio", "+95 sacos", "Proveedor NutriAvic", "Stock crítico cubierto")
-        );
-    }
-
-    public void setHeader(String header) {
-        if (lblHeader != null) lblHeader.setText(header);
-        if (lblUserInfo != null) lblUserInfo.setText(header);
-    }
-
-    @FXML
-    private void onExit() {
-        if (lblHeader != null) {
-            Stage st = (Stage) lblHeader.getScene().getWindow();
-            st.close();
-        }
-    }
-
-    /* ======== NAV (stubs) ======== */
-    @FXML private void goDashboard()  { markActive("Tablero"); }
-    @FXML private void goSupplies()   { markActive("Suministros"); }
+    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
+    @FXML private void goSupplies()   { App.goTo("/fxml/supplies.fxml", "SIA Avitech — Suministros"); }
     @FXML private void goHealth()     { markActive("Sanidad"); }
     @FXML private void goProduction() { markActive("Producción"); }
     @FXML private void goReports()    { markActive("Reportes"); }
@@ -124,8 +66,320 @@ public class SuppliesController {
     @FXML private void goUsers()      { markActive("Usuarios"); }
     @FXML private void goBackup()     { markActive("Respaldos"); }
 
+    @FXML
+    private void onRegisterEntry() {
+        Dialog<ButtonType> dialog = construirDialogoMovimiento(
+                "Registrar Entrada de Stock",
+                "Registra una nueva entrada de suministros.",
+                "Registrar entrada",
+                List.of(
+                        new FieldSpec("Producto", new ComboBox<>(FXCollections.observableArrayList(
+                                "Maíz Amarillo", "Concentrado Ponedor", "Vitaminas A-D")), true),
+                        new FieldSpec("Fecha", new DatePicker(LocalDate.now()), true),
+                        new FieldSpec("Cantidad", new TextField(), true),
+                        new FieldSpec("Unidad", new ComboBox<>(FXCollections.observableArrayList("Kilogramos", "Sacos", "Litros")), true),
+                        new FieldSpec("Ubicación", new ComboBox<>(FXCollections.observableArrayList("Bodega Central", "Galpón 3", "Silo Norte")), true),
+                        new FieldSpec("Proveedor", new TextField(), false),
+                        new FieldSpec("Número de lote", new TextField(), false),
+                        new FieldSpec("Notas", new TextArea(), false)
+                ),
+                "Nota: Al confirmar, se actualizará automáticamente el inventario del producto.");
+
+        dialog.showAndWait().ifPresent(result -> {
+            if (result.getButtonData().isDefaultButton()) {
+                mostrarConfirmacion("Entrada registrada correctamente.");
+            }
+        });
+    }
+
+    @FXML
+    private void onRegisterExit() {
+        Dialog<ButtonType> dialog = construirDialogoMovimiento(
+                "Registrar Salida de Stock",
+                "Registra una salida por consumo interno o movimiento.",
+                "Registrar salida",
+                List.of(
+                        new FieldSpec("Producto", new ComboBox<>(FXCollections.observableArrayList(
+                                "Concentrado Ponedor", "Vitaminas A-D", "Desinfectante")), true),
+                        new FieldSpec("Fecha", new DatePicker(LocalDate.now()), true),
+                        new FieldSpec("Cantidad", new TextField(), true),
+                        new FieldSpec("Unidad", new ComboBox<>(FXCollections.observableArrayList("Kilogramos", "Litros", "Unidades")), true),
+                        new FieldSpec("Ubicación", new ComboBox<>(FXCollections.observableArrayList("Galpón 1", "Galpón 2", "Enfermería")), true),
+                        new FieldSpec("Fuente / Motivo", new TextField(), false),
+                        new FieldSpec("Destino / Referencia", new TextField(), false),
+                        new FieldSpec("Notas", new TextArea(), false)
+                ),
+                "Importante: Verifica el stock disponible antes de confirmar el retiro.");
+
+        dialog.showAndWait().ifPresent(result -> {
+            if (result.getButtonData().isDefaultButton()) {
+                mostrarConfirmacion("Salida registrada correctamente.");
+            }
+        });
+    }
+
+    @FXML
+    private void onViewStock() {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Resumen de Stock Actual");
+        dialog.setHeaderText("Resumen general del inventario por producto");
+        establecerOwner(dialog);
+        dialog.getDialogPane().getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().add(ButtonType.CLOSE);
+        pane.setPrefWidth(520);
+
+        VBox content = new VBox(12);
+        content.setPadding(new Insets(10, 0, 0, 0));
+
+        VBox listado = new VBox(10);
+        listado.getChildren().addAll(
+                crearResumenProducto("Concentrado Ponedor", "Bodega Central", "980 kg", false),
+                crearResumenProducto("Maíz Amarillo", "Silo Norte", "1.250 kg", false),
+                crearResumenProducto("Antibiótico BroadCare", "Enfermería", "12 frascos", true)
+        );
+
+        Text alerta = new Text("Productos con stock bajo\n• Antibiótico BroadCare — Quedan 12 frascos\n• Desinfectante bioseguridad C16 — Quedan 8 litros");
+        alerta.getStyleClass().add("muted");
+
+        VBox alertaBox = new VBox(alerta);
+        alertaBox.getStyleClass().add("card");
+        alertaBox.setStyle("-fx-background-color: rgba(248,113,113,0.12);");
+        alertaBox.setPadding(new Insets(12));
+
+        content.getChildren().addAll(listado, alertaBox);
+        pane.setContent(content);
+
+        dialog.showAndWait();
+    }
+
+    @FXML
+    private void onMoveStock() {
+        Dialog<ButtonType> dialog = construirDialogoMovimiento(
+                "Mover Stock entre Ubicaciones",
+                "Transfiere productos entre diferentes almacenes de la granja.",
+                "Mover stock",
+                List.of(
+                        new FieldSpec("Producto", new ComboBox<>(FXCollections.observableArrayList(
+                                "Concentrado Ponedor", "Maíz Amarillo", "Desinfectante")), true),
+                        new FieldSpec("Cantidad a mover", new TextField(), true),
+                        new FieldSpec("Ubicación origen", new ComboBox<>(FXCollections.observableArrayList("Bodega Central", "Silo Norte", "Galpón 3")), true),
+                        new FieldSpec("Ubicación destino", new ComboBox<>(FXCollections.observableArrayList("Galpón 1", "Galpón 2", "Enfermería")), true),
+                        new FieldSpec("Responsable", new TextField(), false),
+                        new FieldSpec("Motivo del movimiento", new TextArea(), false)
+                ),
+                "Recuerda documentar el motivo del movimiento para mantener la trazabilidad.");
+
+        dialog.showAndWait().ifPresent(result -> {
+            if (result.getButtonData().isDefaultButton()) {
+                mostrarConfirmacion("Movimiento registrado correctamente.");
+            }
+        });
+    }
+
+    private void configurarTablas() {
+        if (tblMovimientos == null) {
+            return;
+        }
+
+        colFecha.setCellValueFactory(data -> data.getValue().dateProperty());
+        colProducto.setCellValueFactory(data -> data.getValue().productProperty());
+        colTipo.setCellValueFactory(data -> data.getValue().typeProperty());
+        colCantidad.setCellValueFactory(data -> data.getValue().quantityProperty());
+        colUbicacion.setCellValueFactory(data -> data.getValue().locationProperty());
+        colReferencia.setCellValueFactory(data -> data.getValue().referenceProperty());
+
+        colTipo.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Label badge = new Label(item.toUpperCase());
+                    badge.getStyleClass().add("badge");
+                    if ("Entrada".equalsIgnoreCase(item)) {
+                        badge.getStyleClass().add("success");
+                    } else if ("Salida".equalsIgnoreCase(item)) {
+                        badge.getStyleClass().add("warning");
+                    } else {
+                        badge.getStyleClass().add("info");
+                    }
+                    setGraphic(badge);
+                    setText(null);
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
+
+        tblMovimientos.setItems(movimientos);
+    }
+
+    private void configurarFiltros() {
+        if (cbFiltroProducto != null) {
+            cbFiltroProducto.getItems().setAll("Todos", "Concentrado Ponedor", "Maíz Amarillo", "Vitaminas", "Desinfectante");
+            cbFiltroProducto.getSelectionModel().selectFirst();
+        }
+
+        if (cbFiltroUbicacion != null) {
+            cbFiltroUbicacion.getItems().setAll("Todas", "Bodega Central", "Silo Norte", "Galpón 1", "Galpón 2");
+            cbFiltroUbicacion.getSelectionModel().selectFirst();
+        }
+
+        if (cbFiltroTipo != null) {
+            cbFiltroTipo.getItems().setAll("Todos", "Entradas", "Salidas", "Ajustes");
+            cbFiltroTipo.getSelectionModel().selectFirst();
+        }
+
+        if (dpFiltroDesde != null) {
+            dpFiltroDesde.setValue(LocalDate.now().minusDays(7));
+        }
+    }
+
+    private void cargarDatosDemo() {
+        lblResumenFecha.setText("Actualizado " + LocalDate.now().format(DATE_FORMAT));
+        lblEstadoStock.setText("Stock saludable");
+        lblStockDisponible.setText("1.245 kg");
+        lblStockMeta.setText("Meta diaria: 1.200 kg");
+        lblConsumoHoy.setText("312 kg");
+        lblEntradasProgramadas.setText("3");
+        lblAlertasActivas.setText("2");
+        lblStockTotal.setText("1.245 kg");
+        lblUltimoMovimiento.setText("Salida - 18 kg (Galpón 2)");
+        lblRecomendacion.setText("Siguiente revisión: 4:00 PM");
+
+        movimientos.setAll(
+                new StockMovement("21 May 2024", "Concentrado Ponedor", "Salida", "18 kg", "Galpón 2", "Consumo diario"),
+                new StockMovement("21 May 2024", "Maíz Amarillo", "Entrada", "500 kg", "Bodega Central", "Factura 2215"),
+                new StockMovement("20 May 2024", "Vitaminas A-D", "Salida", "6 frascos", "Enfermería", "Lote tratamiento"),
+                new StockMovement("20 May 2024", "Desinfectante C16", "Ajuste", "-2 L", "Galpón 1", "Inventario mensual")
+        );
+
+        if (lstAlertas != null) {
+            lstAlertas.setItems(FXCollections.observableArrayList(
+                    "Stock bajo: Antibiótico BroadCare (12 frascos)",
+                    "Entrada programada: Concentrado Ponedor — 22/05",
+                    "Revisión pendiente: Silo Norte (limpieza programada)"
+            ));
+        }
+    }
+
+    private void mostrarConfirmacion(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Operación realizada");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje + "\nEstas acciones pueden enlazarse con la base de datos en el futuro.");
+        alert.getDialogPane().getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
+        javafx.stage.Window owner = obtenerVentana();
+        if (owner != null) {
+            alert.initOwner(owner);
+        }
+        alert.showAndWait();
+    }
+
+    private Dialog<ButtonType> construirDialogoMovimiento(String titulo,
+                                                          String descripcion,
+                                                          String textoConfirmar,
+                                                          List<FieldSpec> campos,
+                                                          String notaFinal) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(titulo);
+        dialog.setHeaderText(descripcion);
+        establecerOwner(dialog);
+        dialog.getDialogPane().getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
+        dialog.getDialogPane().setPrefWidth(540);
+
+        ButtonType confirmar = new ButtonType(textoConfirmar, ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, confirmar);
+
+        Node confirmButton = dialog.getDialogPane().lookupButton(confirmar);
+        if (confirmButton != null) {
+            confirmButton.getStyleClass().add("primary");
+        }
+        Node cancelButton = dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        if (cancelButton != null) {
+            cancelButton.getStyleClass().add("ghostBtn");
+        }
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setPadding(new Insets(10, 0, 0, 0));
+
+        int row = 0;
+        for (FieldSpec campo : campos) {
+            Label label = new Label(campo.label() + (campo.requerido() ? " *" : ""));
+            label.getStyleClass().add("field-label");
+
+            Node control = campo.control();
+            if (control instanceof TextArea area) {
+                area.setPrefRowCount(3);
+                area.setWrapText(true);
+            }
+            if (control instanceof ComboBox<?> combo) {
+                combo.setMaxWidth(Double.MAX_VALUE);
+            }
+            if (control instanceof TextField field) {
+                field.setMaxWidth(Double.MAX_VALUE);
+            }
+
+            GridPane.setConstraints(label, 0, row);
+            GridPane.setConstraints(control, 1, row);
+            GridPane.setHgrow(control, javafx.scene.layout.Priority.ALWAYS);
+            grid.getChildren().addAll(label, control);
+            row++;
+        }
+
+        VBox contenedor = new VBox(12, grid);
+        if (notaFinal != null && !notaFinal.isBlank()) {
+            Label nota = new Label(notaFinal);
+            nota.getStyleClass().add("muted");
+            nota.setWrapText(true);
+            contenedor.getChildren().add(nota);
+        }
+
+        dialog.getDialogPane().setContent(contenedor);
+        return dialog;
+    }
+
+    private HBox crearResumenProducto(String producto, String ubicacion, String cantidad, boolean critico) {
+        Label lblProducto = new Label(producto);
+        lblProducto.getStyleClass().add("card-title");
+
+        Label lblUbicacion = new Label(ubicacion);
+        lblUbicacion.getStyleClass().add("muted");
+
+        Label lblCantidad = new Label(cantidad);
+        lblCantidad.getStyleClass().add("stock-value");
+        if (critico) {
+            lblCantidad.getStyleClass().add("critical");
+        }
+
+        Pane spacer = new Pane();
+        HBox box = new HBox(12, lblProducto, new Separator(), lblUbicacion, spacer, lblCantidad);
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        box.setAlignment(Pos.CENTER_LEFT);
+        return box;
+    }
+
+    private javafx.stage.Window obtenerVentana() {
+        return sidebar != null && sidebar.getScene() != null ? sidebar.getScene().getWindow() : null;
+    }
+
+    private void establecerOwner(Dialog<?> dialog) {
+        javafx.stage.Window owner = obtenerVentana();
+        if (owner != null) {
+            dialog.initOwner(owner);
+        }
+    }
+
     private void markActive(String text) {
-        if (sidebar == null) return;
+        if (sidebar == null) {
+            return;
+        }
+
         sidebar.lookupAll(".side-btn").forEach(n -> n.getStyleClass().remove("active"));
         sidebar.lookupAll(".side-btn").stream()
                 .filter(n -> n instanceof ToggleButton tb && tb.getText().equals(text))
@@ -133,62 +387,30 @@ public class SuppliesController {
                 .ifPresent(n -> n.getStyleClass().add("active"));
     }
 
-    /* ======== ACCIONES ======== */
-    @FXML private void onApplyFilters() {
-        // Placeholder para la lógica de filtrado
-    }
+    private record FieldSpec(String label, Control control, boolean requerido) {}
 
-    @FXML private void onClearFilters() {
-        if (txtBuscar != null) txtBuscar.clear();
-        if (cbCategoria != null) cbCategoria.getSelectionModel().clearSelection();
-        if (dpFecha != null) dpFecha.setValue(null);
-    }
+    public static class StockMovement {
+        private final javafx.beans.property.SimpleStringProperty date;
+        private final javafx.beans.property.SimpleStringProperty product;
+        private final javafx.beans.property.SimpleStringProperty type;
+        private final javafx.beans.property.SimpleStringProperty quantity;
+        private final javafx.beans.property.SimpleStringProperty location;
+        private final javafx.beans.property.SimpleStringProperty reference;
 
-    @FXML private void onEntrada() {
-        // Placeholder para registrar una entrada de suministros
-    }
-
-    @FXML private void onSalida() {
-        // Placeholder para registrar una salida de suministros
-    }
-
-    @FXML private void onMoveStock() {
-        // Placeholder para mover stock entre almacenes
-    }
-
-    public static class Movimiento {
-        private final SimpleStringProperty fecha = new SimpleStringProperty();
-        private final SimpleStringProperty tipo = new SimpleStringProperty();
-        private final SimpleStringProperty producto = new SimpleStringProperty();
-        private final SimpleStringProperty cantidad = new SimpleStringProperty();
-        private final SimpleStringProperty responsable = new SimpleStringProperty();
-        private final SimpleStringProperty notas = new SimpleStringProperty();
-
-        public Movimiento(String fecha, String tipo, String producto, String cantidad, String responsable, String notas) {
-            this.fecha.set(fecha);
-            this.tipo.set(tipo);
-            this.producto.set(producto);
-            this.cantidad.set(cantidad);
-            this.responsable.set(responsable);
-            this.notas.set(notas);
+        public StockMovement(String date, String product, String type, String quantity, String location, String reference) {
+            this.date = new javafx.beans.property.SimpleStringProperty(date);
+            this.product = new javafx.beans.property.SimpleStringProperty(product);
+            this.type = new javafx.beans.property.SimpleStringProperty(type);
+            this.quantity = new javafx.beans.property.SimpleStringProperty(quantity);
+            this.location = new javafx.beans.property.SimpleStringProperty(location);
+            this.reference = new javafx.beans.property.SimpleStringProperty(reference);
         }
 
-        public String getFecha() { return fecha.get(); }
-        public SimpleStringProperty fechaProperty() { return fecha; }
-
-        public String getTipo() { return tipo.get(); }
-        public SimpleStringProperty tipoProperty() { return tipo; }
-
-        public String getProducto() { return producto.get(); }
-        public SimpleStringProperty productoProperty() { return producto; }
-
-        public String getCantidad() { return cantidad.get(); }
-        public SimpleStringProperty cantidadProperty() { return cantidad; }
-
-        public String getResponsable() { return responsable.get(); }
-        public SimpleStringProperty responsableProperty() { return responsable; }
-
-        public String getNotas() { return notas.get(); }
-        public SimpleStringProperty notasProperty() { return notas; }
+        public javafx.beans.property.StringProperty dateProperty() { return date; }
+        public javafx.beans.property.StringProperty productProperty() { return product; }
+        public javafx.beans.property.StringProperty typeProperty() { return type; }
+        public javafx.beans.property.StringProperty quantityProperty() { return quantity; }
+        public javafx.beans.property.StringProperty locationProperty() { return location; }
+        public javafx.beans.property.StringProperty referenceProperty() { return reference; }
     }
 }

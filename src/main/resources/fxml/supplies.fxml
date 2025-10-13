@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -18,7 +19,6 @@
                       minWidth="270" prefWidth="270" maxWidth="270"
                       fillWidth="true">
                     <children>
-
                         <Label text="Menú Principal" styleClass="sidebar-title"/>
 
                         <fx:define>
@@ -39,9 +39,7 @@
                         <Region VBox.vgrow="ALWAYS"/>
 
                         <Label text="Usuario del sistema" styleClass="sidebar-subtitle"/>
-                        <Label fx:id="lblUserInfo" text="Administrador" styleClass="sidebar-user"/>
-
-                        <Button text="Cerrar sesión" onAction="#onExit" styleClass="side-logout"/>
+                        <Label text="Administrador" styleClass="sidebar-user"/>
                     </children>
 
                     <padding>
@@ -52,111 +50,205 @@
         </ScrollPane>
     </left>
 
-    <top>
-        <HBox spacing="12" styleClass="topbar">
-            <children>
-                <Label text="AVITECH — SIA" styleClass="topbar-brand"/>
-                <Pane HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblSystemStatus" text="Sistema Offline – MySQL Local" styleClass="topbar-status"/>
-                <Separator orientation="VERTICAL"/>
-                <Label fx:id="lblHeader" text="Administrador"/>
-                <Button text="↩ Salir" onAction="#onExit" styleClass="ghostBtn"/>
-            </children>
-            <padding><Insets topRightBottomLeft="10"/></padding>
-        </HBox>
-    </top>
-
     <center>
-        <ScrollPane fx:id="spContent"
-                    fitToWidth="true" fitToHeight="false"
+        <ScrollPane fitToWidth="true" fitToHeight="false"
                     vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED"
                     pannable="true">
             <content>
-                <VBox fx:id="contentRoot" spacing="18" styleClass="content"
+                <VBox spacing="18" styleClass="content"
                       fillWidth="true" maxWidth="Infinity">
                     <children>
-                        <Label text="Gestión de suministros" styleClass="h2"/>
-                        <Label text="Control y seguimiento de inventarios para la operación avícola" styleClass="helper"/>
-
-                        <HBox spacing="12">
+                        <VBox spacing="4">
                             <children>
-                                <VBox fx:id="cardMovimientosHoy" styleClass="card" minWidth="0" prefWidth="280" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Movimientos hoy" styleClass="card-title"/>
-                                        <Label fx:id="lblMovimientosHoy" text="—" styleClass="card-kpi"/>
-                                        <Label text="Entradas y salidas registradas" styleClass="helper"/>
-                                    </children>
-                                </VBox>
-
-                                <VBox fx:id="cardProductos" styleClass="card" minWidth="0" prefWidth="280" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Productos" styleClass="card-title"/>
-                                        <Label fx:id="lblProductos" text="—" styleClass="card-kpi"/>
-                                        <Label text="Ítems activos en inventario" styleClass="helper"/>
-                                    </children>
-                                </VBox>
-
-                                <VBox fx:id="cardStockBajo" styleClass="card" minWidth="0" prefWidth="280" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Stock bajo" styleClass="card-title"/>
-                                        <Label fx:id="lblStockBajo" text="—" styleClass="card-kpi bad"/>
-                                        <Label text="Productos bajo nivel crítico" styleClass="helper"/>
-                                    </children>
-                                </VBox>
-
-                                <VBox fx:id="cardValorTotal" styleClass="card" minWidth="0" prefWidth="280" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Label text="Valor total" styleClass="card-title"/>
-                                        <Label fx:id="lblValorTotal" text="—" styleClass="card-kpi"/>
-                                        <Label text="Suministros valorizados" styleClass="helper"/>
-                                    </children>
-                                </VBox>
-                            </children>
-                        </HBox>
-
-                        <HBox spacing="12" alignment="CENTER_LEFT">
-                            <children>
-                                <TextField fx:id="txtBuscar" promptText="Buscar producto o responsable"/>
-                                <ComboBox fx:id="cbCategoria" promptText="Categoría" prefWidth="180"/>
-                                <DatePicker fx:id="dpFecha" promptText="Fecha"/>
-                                <Button fx:id="btnAplicarFiltros" text="Aplicar filtros" onAction="#onApplyFilters" styleClass="button primary"/>
-                                <Button fx:id="btnLimpiarFiltros" text="Limpiar" onAction="#onClearFilters" styleClass="button secondary"/>
-                            </children>
-                        </HBox>
-
-                        <VBox styleClass="card" spacing="12" minWidth="0">
-                            <children>
-                                <HBox alignment="CENTER_LEFT" spacing="12">
-                                    <children>
-                                        <VBox>
-                                            <children>
-                                                <Label text="Historial de movimientos" styleClass="card-title"/>
-                                                <Label text="Detalle de entradas, salidas y transferencias" styleClass="helper"/>
-                                            </children>
-                                        </VBox>
-                                        <Pane HBox.hgrow="ALWAYS"/>
-                                        <Button text="Registrar entrada" onAction="#onEntrada" styleClass="button primary"/>
-                                        <Button text="Registrar salida" onAction="#onSalida" styleClass="button secondary"/>
-                                        <Button text="Mover stock" onAction="#onMoveStock" styleClass="button secondary"/>
-                                    </children>
-                                </HBox>
-
-                                <TableView fx:id="tblMovimientos" prefHeight="420" VBox.vgrow="ALWAYS">
-                                    <columns>
-                                        <TableColumn fx:id="colFecha" text="Fecha" prefWidth="120"/>
-                                        <TableColumn fx:id="colTipo" text="Tipo" prefWidth="120"/>
-                                        <TableColumn fx:id="colProducto" text="Producto" prefWidth="200"/>
-                                        <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="120"/>
-                                        <TableColumn fx:id="colResponsable" text="Responsable" prefWidth="160"/>
-                                        <TableColumn fx:id="colNotas" text="Notas" prefWidth="220"/>
-                                    </columns>
-                                </TableView>
+                                <Label text="Suministros y Alimentos" styleClass="h2"/>
+                                <Label text="Gestión del stock, entradas y salidas" styleClass="helper"/>
                             </children>
                         </VBox>
+
+                        <HBox spacing="12" alignment="TOP_CENTER">
+                            <children>
+                                <VBox styleClass="card" spacing="18" minWidth="0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="12">
+                                            <children>
+                                                <VBox spacing="2">
+                                                    <children>
+                                                        <Label text="Resumen General" styleClass="card-title"/>
+                                                        <Label fx:id="lblResumenFecha" text="Actualizado hoy 09:41" styleClass="muted"/>
+                                                    </children>
+                                                </VBox>
+                                                <Pane HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="lblEstadoStock" text="Stock saludable" styleClass="badge success"/>
+                                            </children>
+                                        </HBox>
+
+                                        <GridPane hgap="18" vgap="18">
+                                            <columnConstraints>
+                                                <ColumnConstraints percentWidth="50"/>
+                                                <ColumnConstraints percentWidth="50"/>
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints vgrow="ALWAYS"/>
+                                                <RowConstraints vgrow="ALWAYS"/>
+                                            </rowConstraints>
+                                            <children>
+                                                <VBox styleClass="metric-card" spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                                    <children>
+                                                        <Label text="Stock Disponible" styleClass="metric-title"/>
+                                                        <Label fx:id="lblStockDisponible" text="0 kg" styleClass="metric-value"/>
+                                                        <Label fx:id="lblStockMeta" text="Meta diaria: 320 kg" styleClass="metric-helper"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox styleClass="metric-card" spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                                    <children>
+                                                        <Label text="Consumo Hoy" styleClass="metric-title"/>
+                                                        <Label fx:id="lblConsumoHoy" text="0 kg" styleClass="metric-value"/>
+                                                        <Label text="Vs. promedio semanal" styleClass="metric-helper"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox styleClass="metric-card" spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="0">
+                                                    <children>
+                                                        <Label text="Entradas Programadas" styleClass="metric-title"/>
+                                                        <Label fx:id="lblEntradasProgramadas" text="0" styleClass="metric-value"/>
+                                                        <Label text="Próximas 48 horas" styleClass="metric-helper"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox styleClass="metric-card" spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                                                    <children>
+                                                        <Label text="Alertas Activas" styleClass="metric-title"/>
+                                                        <Label fx:id="lblAlertasActivas" text="0" styleClass="metric-value critical"/>
+                                                        <Label text="Productos bajo mínimo" styleClass="metric-helper"/>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </GridPane>
+
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <children>
+                                                <VBox spacing="2">
+                                                    <children>
+                                                        <Label text="Stock total disponible" styleClass="card-title"/>
+                                                        <Label fx:id="lblStockTotal" text="0 kg" styleClass="stock-value"/>
+                                                    </children>
+                                                </VBox>
+                                                <Separator orientation="VERTICAL" prefHeight="44"/>
+                                                <VBox spacing="2">
+                                                    <children>
+                                                        <Label text="Último movimiento" styleClass="card-title"/>
+                                                        <Label fx:id="lblUltimoMovimiento" text="—" styleClass="muted"/>
+                                                    </children>
+                                                </VBox>
+                                                <Pane HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="lblRecomendacion" text="Siguiente revisión: 4:00 PM" styleClass="helper"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox styleClass="card" spacing="12" minWidth="280" prefWidth="320" HBox.hgrow="NEVER">
+                                    <children>
+                                        <Label text="Acciones rápidas" styleClass="card-title"/>
+                                        <Label text="Registra las operaciones del inventario en tiempo real." styleClass="helper" wrapText="true"/>
+                                        <Button fx:id="btnRegistrarEntrada" text="➕ Registrar entrada" onAction="#onRegisterEntry" styleClass="primary" maxWidth="Infinity"/>
+                                        <Button fx:id="btnRegistrarSalida" text="➖ Registrar salida" onAction="#onRegisterExit" styleClass="secondary" maxWidth="Infinity"/>
+                                        <Separator/>
+                                        <Button fx:id="btnVerStock" text="👁 Ver stock actual" onAction="#onViewStock" styleClass="ghostBtn" maxWidth="Infinity"/>
+                                        <Button fx:id="btnMoverStock" text="🔁 Mover stock entre ubicaciones" onAction="#onMoveStock" styleClass="ghostBtn" maxWidth="Infinity" wrapText="true"/>
+                                        <Label text="Nota: Estos botones pueden conectarse a la base de datos cuando esté disponible." styleClass="muted" wrapText="true"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="12" alignment="TOP_CENTER">
+                            <children>
+                                <VBox styleClass="card" spacing="14" minWidth="0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="10">
+                                            <children>
+                                                <Label text="Historial de movimientos de stock" styleClass="card-title"/>
+                                                <Label text="Últimos registros" styleClass="badge info"/>
+                                            </children>
+                                        </HBox>
+                                        <Label text="Controla entradas, salidas y ajustes recientes del inventario." styleClass="helper" wrapText="true"/>
+
+                                        <TableView fx:id="tblMovimientos" prefHeight="320" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="colFecha" text="Fecha" prefWidth="120"/>
+                                                <TableColumn fx:id="colProducto" text="Producto" prefWidth="160"/>
+                                                <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100"/>
+                                                <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="120"/>
+                                                <TableColumn fx:id="colUbicacion" text="Ubicación" prefWidth="140"/>
+                                                <TableColumn fx:id="colReferencia" text="Referencia" prefWidth="160"/>
+                                            </columns>
+                                        </TableView>
+
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label text="Los movimientos se sincronizan con ERP central cada 15 minutos." styleClass="muted"/>
+                                                <Pane HBox.hgrow="ALWAYS"/>
+                                                <Button text="Ver historial completo" styleClass="ghostBtn small"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="12" HBox.hgrow="NEVER" minWidth="280" prefWidth="320">
+                                    <children>
+                                        <VBox styleClass="card" spacing="12">
+                                            <children>
+                                                <Label text="Alertas y pendientes" styleClass="card-title"/>
+                                                <ListView fx:id="lstAlertas" prefHeight="220"/>
+                                                <Label text="Importante: Verifica las alertas y registra cualquier acción correctiva." styleClass="muted" wrapText="true"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox styleClass="card" spacing="12">
+                                            <children>
+                                                <Label text="Filtros rápidos" styleClass="card-title"/>
+                                                <GridPane hgap="10" vgap="10">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints percentWidth="50"/>
+                                                        <ColumnConstraints percentWidth="50"/>
+                                                    </columnConstraints>
+                                                    <children>
+                                                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                            <children>
+                                                                <Label text="Producto" styleClass="field-label"/>
+                                                                <ComboBox fx:id="cbFiltroProducto" promptText="Todos"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                            <children>
+                                                                <Label text="Ubicación" styleClass="field-label"/>
+                                                                <ComboBox fx:id="cbFiltroUbicacion" promptText="Todas"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                                            <children>
+                                                                <Label text="Tipo" styleClass="field-label"/>
+                                                                <ComboBox fx:id="cbFiltroTipo" promptText="Entradas/Salidas"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                            <children>
+                                                                <Label text="Rango de fechas" styleClass="field-label"/>
+                                                                <DatePicker fx:id="dpFiltroDesde" promptText="Desde"/>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </GridPane>
+                                                <Button text="Aplicar filtros" styleClass="secondary" maxWidth="Infinity"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
                     </children>
 
                     <padding>
-                        <Insets top="24" right="24" bottom="40" left="24"/>
+                        <Insets top="24" right="24" bottom="24" left="24"/>
                     </padding>
                 </VBox>
             </content>
