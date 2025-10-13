@@ -4,7 +4,6 @@ import com.avitech.sia.App;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class SuppliesController {
     @FXML private VBox sidebar;
@@ -24,15 +23,6 @@ public class SuppliesController {
     @FXML private void goParams()     { markActive("Parámetros"); }
     @FXML private void goUsers()      { markActive("Usuarios"); }
     @FXML private void goBackup()     { markActive("Respaldos"); }
-
-    @FXML
-    private void onExit() {
-        if (sidebar == null) {
-            return;
-        }
-        Stage stage = (Stage) sidebar.getScene().getWindow();
-        stage.close();
-    }
 
     private void markActive(String text) {
         if (sidebar == null) {
