@@ -1,4 +1,4 @@
-package com.avitech.sia.ui;
+package com.avitech.sia.iu;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

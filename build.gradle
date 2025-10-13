@@ -6,18 +6,14 @@ plugins {
 group = 'com.avitech'
 version = '0.0.1'
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    toolchain { languageVersion = JavaLanguageVersion.of(21) }
 }
 
 application {
-    mainClass = 'com.avitech.sia.App'   // la crearemos en el Paso 3
+    mainClass = 'com.avitech.sia.App'
 }
 
 javafx {
@@ -26,13 +22,15 @@ javafx {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     implementation 'com.mysql:mysql-connector-j:8.4.0'
     implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'at.favre.lib:bcrypt:0.10.2'
+
+    // logging simple (opcional)
     implementation 'org.slf4j:slf4j-api:2.0.16'
     runtimeOnly   'org.slf4j:slf4j-simple:2.0.16'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
 }
 
-test {
-    useJUnitPlatform()
-}
+test { useJUnitPlatform() }

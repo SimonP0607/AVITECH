@@ -2,7 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.avitech.sia.ui.HelloController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.avitech.sia.iu.HelloController">
     <center>
         <VBox alignment="CENTER" spacing="12">
             <children>
