@@ -26,11 +26,9 @@ public class LoginController {
         // Sincroniza el texto entre los dos campos
         txtPassPlain.textProperty().bindBidirectional(txtPass.textProperty());
 
-        // Evita que el campo oculto ocupe espacio
         txtPass.managedProperty().bind(txtPass.visibleProperty());
         txtPassPlain.managedProperty().bind(txtPassPlain.visibleProperty());
 
-        // Estado inicial
         txtPass.setVisible(true);
         txtPassPlain.setVisible(false);
 
@@ -40,7 +38,6 @@ public class LoginController {
         txtUser.setOnKeyPressed(this::onEnterKey);
     }
 
-    // --- Evento para alternar visibilidad de contraseña ---
     @FXML
     private void togglePassword(ActionEvent e) {
         boolean showingPlain = txtPassPlain.isVisible();
@@ -48,7 +45,6 @@ public class LoginController {
         txtPassPlain.setVisible(!showingPlain);
         txtPass.setVisible(showingPlain);
 
-        // Cambia icono del botón
         btnTogglePass.setText(showingPlain ? "👁" : "🙈");
 
         // Mantener foco y cursor
@@ -61,7 +57,6 @@ public class LoginController {
         }
     }
 
-    // --- Evento de botón Ingresar ---
     @FXML
     private void doLogin(ActionEvent e) {
         login();
