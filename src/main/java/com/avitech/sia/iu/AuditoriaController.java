@@ -1,5 +1,6 @@
 package com.avitech.sia.iu;
 
+import com.avitech.sia.App;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -149,17 +150,20 @@ public class AuditoriaController {
         ));
     }
 
-    /* ====== Sidebar navigation (stubs seguros) ====== */
-    @FXML private void goDashboard()  { /* pegamos App.goTo(...) cuando lo tengamos */ }
-    @FXML private void goSupplies()   { }
-    @FXML private void goHealth()     { }
-    @FXML private void goProduction() { }
-    @FXML private void goReports()    { }
-    @FXML private void goAlerts()     { }
-    @FXML private void goParams()     { }
-    @FXML private void goUsers()      { }
-    @FXML private void goBackup()     { }
-    @FXML private void onExit()       { /* cerrar sesión / volver a login */ }
+    /* ================== Navegación ================== */
+    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
+    @FXML private void goSupplies()   { App.goTo("/fxml/suministros.fxml", "SIA Avitech — Suministros"); }
+    @FXML private void goHealth()     { App.goTo("/fxml/sanidad.fxml", "SIA Avitech — Sanidad"); }
+    @FXML private void goProduction() { App.goTo("/fxml/produccion.fxml", "SIA Avitech — Producción"); }
+    @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
+    @FXML private void goAlerts()     { App.goTo("/fxml/alertas.fxml", "SIA Avitech — Alertas"); }
+    @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
+    @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
+    @FXML private void goUsers()      { App.goTo("/fxml/usuarios.fxml", "SIA Avitech — Usuarios"); }
+    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
+    @FXML private void onExit() {
+        App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");
+    }
 
     /* ====== Helpers ====== */
 

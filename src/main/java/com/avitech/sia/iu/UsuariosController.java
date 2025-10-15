@@ -1,5 +1,6 @@
 package com.avitech.sia.iu;
 
+import com.avitech.sia.App;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -144,17 +145,20 @@ public class UsuariosController {
         System.out.println("Nuevo Usuario… (abrir modal)");
     }
 
-    /* ===== Navegación sidebar (stubs, ya los conectas con App.goTo o tu router) ===== */
-    @FXML private void goDashboard()  { System.out.println("Ir: Tablero"); }
-    @FXML private void goSupplies()   { System.out.println("Ir: Suministros"); }
-    @FXML private void goHealth()     { System.out.println("Ir: Sanidad"); }
-    @FXML private void goProduction() { System.out.println("Ir: Producción"); }
-    @FXML private void goReports()    { System.out.println("Ir: Reportes"); }
-    @FXML private void goAlerts()     { System.out.println("Ir: Alertas"); }
-    @FXML private void goAudit()      { System.out.println("Ir: Auditoría"); }
-    @FXML private void goParams()     { System.out.println("Ir: Parámetros"); }
-    @FXML private void goBackup()     { System.out.println("Ir: Respaldos"); }
-    @FXML private void onExit()       { System.out.println("Salir…"); }
+    /* ================== Navegación ================== */
+    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
+    @FXML private void goSupplies()   { App.goTo("/fxml/suministros.fxml", "SIA Avitech — Suministros"); }
+    @FXML private void goHealth()     { App.goTo("/fxml/sanidad.fxml", "SIA Avitech — Sanidad"); }
+    @FXML private void goProduction() { App.goTo("/fxml/produccion.fxml", "SIA Avitech — Producción"); }
+    @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
+    @FXML private void goAlerts()     { App.goTo("/fxml/alertas.fxml", "SIA Avitech — Alertas"); }
+    @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
+    @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
+    @FXML private void goUsers()      { App.goTo("/fxml/usuarios.fxml", "SIA Avitech — Usuarios"); }
+    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
+    @FXML private void onExit() {
+        App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");
+    }
 
     /* ===== Modelo de fila ===== */
     public record UserRow(String nombre,

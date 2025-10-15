@@ -136,7 +136,7 @@
                                         <TableColumn fx:id="colGalpon"    text="Galpón"      prefWidth="110"/>
                                         <TableColumn fx:id="colAves"      text="Aves"        prefWidth="90"/>
                                         <TableColumn fx:id="colProduccion" text="Producción" prefWidth="120"/>
-                                        <TableColumn fx:id="colPostura"   text="% Postura"   prefWidth="120"/>
+                                        <TableColumn fx:id="colPostura"   text="Postura"  prefWidth="120"/>
                                         <TableColumn fx:id="colPeso"      text="Peso Prom."  prefWidth="110"/>
                                         <TableColumn fx:id="colClasif"    text="Clasificación" prefWidth="220"/>
                                         <TableColumn fx:id="colMortalidad" text="Mortalidad" prefWidth="100"/>

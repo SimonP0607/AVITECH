@@ -88,13 +88,13 @@ public class LoginController {
         if (user.equals("supervisor") && pass.equals("super123")) {
             // Si ya tienes el FXML del supervisor, cámbialo aquí:
             // App.goTo("/fxml/dashboard_supervisor.fxml", "SIA Avitech — SUPERVISOR");
-            App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — SUPERVISOR (demo)");
+            App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — SUPERVISOR (demo)");
             return;
         }
         if (user.equals("operador") && pass.equals("oper123")) {
             // Si ya tienes el FXML del operador, cámbialo aquí:
             // App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — OPERADOR");
-            App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — OPERADOR (demo)");
+            App.goTo("/fxml/dashboard_super.fxml", "SIA Avitech — OPERADOR (demo)");
             return;
         }
 
