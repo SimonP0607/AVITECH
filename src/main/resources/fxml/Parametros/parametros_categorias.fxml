@@ -18,7 +18,7 @@
                 <TableColumn text="Nombre"     fx:id="cNombre"   prefWidth="220"/>
                 <TableColumn text="Tipo"       fx:id="cTipo"     prefWidth="110"/>
                 <TableColumn text="Color"      fx:id="cColor"    prefWidth="120"/>
-                <TableColumn text="Descripción"fx:id="cDesc"     prefWidth="360"/>
+                <TableColumn text="Descripción" fx:id="cDesc"     prefWidth="360"/>
                 <TableColumn text="Estado"     fx:id="cEstado"   prefWidth="100"/>
                 <TableColumn text="Acciones"   fx:id="cAccion"   prefWidth="120"/>
             </columns>

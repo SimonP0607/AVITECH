@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.avitech.sia.iu.RespaldosController">
+
+    <!-- ============ SIDEBAR ============ -->
+    <left>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="270" styleClass="side-scroll">
+            <content>
+                <VBox fx:id="sidebar" spacing="10" styleClass="sidebar" prefWidth="270">
+                    <children>
+                        <Label text="Menú Principal" styleClass="sidebar-title"/>
+
+                        <fx:define>
+                            <ToggleGroup fx:id="sideGroup"/>
+                        </fx:define>
+
+                        <ToggleButton text="Tablero"        toggleGroup="$sideGroup" onAction="#goDashboard"  styleClass="side-btn"/>
+                        <ToggleButton text="Suministros"    toggleGroup="$sideGroup" onAction="#goSupplies"   styleClass="side-btn"/>
+                        <ToggleButton text="Sanidad"        toggleGroup="$sideGroup" onAction="#goHealth"     styleClass="side-btn"/>
+                        <ToggleButton text="Producción"     toggleGroup="$sideGroup" onAction="#goProduction" styleClass="side-btn"/>
+                        <ToggleButton text="Reportes"       toggleGroup="$sideGroup" onAction="#goReports"    styleClass="side-btn"/>
+                        <ToggleButton text="Alertas"        toggleGroup="$sideGroup" onAction="#goAlerts"     styleClass="side-btn"/>
+                        <ToggleButton text="Auditoría"      toggleGroup="$sideGroup" onAction="#goAudit"      styleClass="side-btn"/>
+                        <ToggleButton text="Parámetros"     toggleGroup="$sideGroup" onAction="#goParams"     styleClass="side-btn"/>
+                        <ToggleButton text="Usuarios"       toggleGroup="$sideGroup" onAction="#goUsers"      styleClass="side-btn"/>
+                        <ToggleButton text="Respaldos"      toggleGroup="$sideGroup" selected="true"          styleClass="side-btn active"/>
+
+                        <Region VBox.vgrow="ALWAYS"/>
+
+                        <Label text="Usuario del sistema" styleClass="sidebar-subtitle"/>
+                        <Label fx:id="lblUserInfo" text="Administrador" styleClass="sidebar-user"/>
+
+                        <Button text="Cerrar sesión" onAction="#onExit" styleClass="side-logout"/>
+                    </children>
+
+                    <padding>
+                        <Insets top="16" right="16" bottom="16" left="16"/>
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </left>
+
+    <!-- ============ TOPBAR ============ -->
+    <top>
+        <HBox spacing="12" styleClass="topbar">
+            <children>
+                <Label text="AVITECH — SIA" styleClass="topbar-brand"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblSystemStatus" text="Sistema Offline – MySQL Local" styleClass="topbar-status"/>
+                <Separator orientation="VERTICAL"/>
+                <Label fx:id="lblHeader" text="Administrador"/>
+                <Button text="↩ Salir" onAction="#onExit" styleClass="ghostBtn"/>
+            </children>
+            <padding><Insets topRightBottomLeft="10"/></padding>
+        </HBox>
+    </top>
+
+    <!-- ============ CONTENT ============ -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <content>
+                <VBox spacing="18" styleClass="content">
+                    <children>
+
+                        <!-- título + acciones superiores -->
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <children>
+                                <VBox spacing="4">
+                                    <children>
+                                        <Label text="Gestión de Respaldos" styleClass="h2"/>
+                                        <Label text="Respaldo automático y manual de la base de datos AVITECH" styleClass="helper"/>
+                                    </children>
+                                </VBox>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <Button text="⟲ Restaurar"   onAction="#onRestaurarGeneral"  styleClass="secondary"/>
+                                <Button text="🟢 Nuevo Respaldo" onAction="#onNuevoRespaldo"   styleClass="primary"/>
+                            </children>
+                        </HBox>
+
+                        <!-- banner de programación -->
+                        <VBox styleClass="card" spacing="6">
+                            <children>
+                                <Label text="Respaldo Automático — Cada 24 horas" styleClass="card-title"/>
+                                <Label fx:id="lblAutoUltimo"   text="Último respaldo: —" styleClass="helper"/>
+                                <Label fx:id="lblAutoProximo"  text="Próximo respaldo: —" styleClass="helper"/>
+                                <Label fx:id="lblAutoTasa"     text="Tasa de éxito: —"   styleClass="helper"/>
+                                <Label fx:id="lblAutoEstado"   text="Activo"             styleClass="helper"/>
+                            </children>
+                        </VBox>
+
+                        <!-- KPIs -->
+                        <HBox spacing="12">
+                            <children>
+                                <VBox styleClass="card" prefWidth="240">
+                                    <children>
+                                        <Label text="Total Respaldos" styleClass="card-title"/>
+                                        <Label fx:id="kpiTotal" text="0" styleClass="card-kpi"/>
+                                    </children>
+                                </VBox>
+                                <VBox styleClass="card" prefWidth="240">
+                                    <children>
+                                        <Label text="Exitosos" styleClass="card-title"/>
+                                        <Label fx:id="kpiOk" text="0" styleClass="card-kpi"/>
+                                    </children>
+                                </VBox>
+                                <VBox styleClass="card" prefWidth="240">
+                                    <children>
+                                        <Label text="Con Errores" styleClass="card-title"/>
+                                        <Label fx:id="kpiErr" text="0" styleClass="card-kpi"/>
+                                    </children>
+                                </VBox>
+                                <VBox styleClass="card" prefWidth="240">
+                                    <children>
+                                        <Label text="Espacio Total" styleClass="card-title"/>
+                                        <Label fx:id="kpiSpace" text="0 GB" styleClass="card-kpi"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <!-- encabezado tabla -->
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Historial de Respaldos" styleClass="card-title"/>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <Button text="Actualizar" styleClass="ghostBtn" onAction="#onActualizar"/>
+                            </children>
+                        </HBox>
+
+                        <!-- tabla -->
+                        <VBox styleClass="card">
+                            <children>
+                                <TableView fx:id="tblBackups" prefHeight="360">
+                                    <columns>
+                                        <TableColumn fx:id="colArchivo"   text="Archivo"     prefWidth="320"/>
+                                        <TableColumn fx:id="colFecha"     text="Fecha/Hora"  prefWidth="160"/>
+                                        <TableColumn fx:id="colTipo"      text="Tipo"        prefWidth="120"/>
+                                        <TableColumn fx:id="colTam"       text="Tamaño"      prefWidth="100"/>
+                                        <TableColumn fx:id="colEstado"    text="Estado"      prefWidth="140"/>
+                                        <TableColumn fx:id="colAcciones"  text="Acciones"    prefWidth="220"/>
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+
+                    </children>
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
