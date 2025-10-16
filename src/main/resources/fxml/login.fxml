@@ -5,99 +5,115 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane xmlns="http://javafx.com/javafx/21"
-          xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="com.avitech.sia.iu.LoginController"
-          stylesheets="@/css/theme.css"
-          prefWidth="1280" prefHeight="720"
-          styleClass="login-root">
+<!-- Contenedor raíz que SIEMPRE crece con la Scene -->
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.avitech.sia.iu.LoginController"
+            stylesheets="@/css/theme.css"
+            minWidth="0.0" minHeight="0.0"
+            maxWidth="Infinity" maxHeight="Infinity"
+            styleClass="login-root">
 
-    <!-- 2 columnas: 58% (branding) / 42% (form) -->
-    <columnConstraints>
-        <ColumnConstraints percentWidth="58" hgrow="ALWAYS"/>
-        <ColumnConstraints percentWidth="42" hgrow="ALWAYS"/>
-    </columnConstraints>
-    <rowConstraints>
-        <RowConstraints vgrow="ALWAYS"/>
-    </rowConstraints>
+    <center>
+        <!-- ScrollPane evita desbordes; se ajusta a ancho/alto -->
+        <ScrollPane fx:id="scroller"
+                    fitToWidth="true" fitToHeight="true"
+                    hbarPolicy="NEVER" pannable="false"
+                    maxWidth="Infinity" maxHeight="Infinity">
 
-    <!-- ===== LEFT: BRANDING ===== -->
-    <StackPane GridPane.columnIndex="0" styleClass="login-left">
-        <children>
-            <VBox alignment="CENTER" spacing="14">
-                <children>
-                    <Label text="AVITECH" styleClass="login-brand"/>
-                    <Label text="Sistema de Información Avícola" styleClass="login-sub"/>
-                    <Label text="Control, producción y trazabilidad en un solo click" styleClass="login-caption"/>
-                </children>
-            </VBox>
-        </children>
-        <padding><Insets top="0" right="40" bottom="0" left="40"/></padding>
-    </StackPane>
+            <!-- GRID en % para dividir izquierda / derecha -->
+            <GridPane fx:id="grid"
+                      minWidth="0.0" minHeight="0.0"
+                      maxWidth="Infinity" maxHeight="Infinity"
+                      hgap="0" vgap="0">
 
-    <!-- ===== RIGHT: FORM ===== -->
-    <StackPane GridPane.columnIndex="1" styleClass="login-right">
-        <children>
-            <!-- VBox centrado vertical y horizontalmente -->
-            <VBox alignment="CENTER" spacing="20" maxWidth="520">
-                <children>
+                <!-- 58% branding / 42% formulario -->
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="58" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="42" hgrow="ALWAYS"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="ALWAYS"/>
+                </rowConstraints>
 
-                    <Label text="Iniciar Sesión" styleClass="login-title"/>
+                <!-- ===== LEFT: BRANDING ===== -->
+                <StackPane GridPane.columnIndex="0" styleClass="login-left"
+                           maxWidth="Infinity" maxHeight="Infinity">
+                    <children>
+                        <VBox alignment="CENTER" spacing="14" fillWidth="true"
+                              maxWidth="800" minWidth="300">
+                            <children>
+                                <Label text="AVITECH" styleClass="login-brand"/>
+                                <Label text="Sistema de Información Avícola" styleClass="login-sub"/>
+                                <Label text="Control, producción y trazabilidad en un solo click" styleClass="login-caption"/>
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding><Insets left="40" right="40"/></padding>
+                </StackPane>
 
-                    <Label text="Ingrese sus credenciales para acceder" styleClass="helper"/>
+                <!-- ===== RIGHT: FORM ===== -->
+                <StackPane GridPane.columnIndex="1" styleClass="login-right"
+                           maxWidth="Infinity" maxHeight="Infinity">
+                    <children>
+                        <!-- Centramos y dejamos ancho máximo, pero permitimos encoger -->
+                        <VBox alignment="CENTER" spacing="20"
+                              maxWidth="520" minWidth="320" fillWidth="true">
+                            <children>
 
-                    <!-- Usuario -->
-                    <VBox spacing="6" maxWidth="Infinity">
-                        <children>
-                            <Label text="Usuario *" styleClass="input-label"/>
-                            <TextField fx:id="txtUser" promptText="Ingrese su usuario"
-                                       maxWidth="Infinity" styleClass="input"/>
-                        </children>
-                    </VBox>
+                                <Label text="Iniciar Sesión" styleClass="login-title"/>
+                                <Label text="Ingrese sus credenciales para acceder" styleClass="helper"/>
 
-                    <!-- Contraseña + botón ojo (a la derecha) -->
-                    <!-- Contraseña + botón ojo (a la derecha) -->
-                    <VBox spacing="6" maxWidth="Infinity">
-                        <children>
-                            <Label text="Contraseña *" styleClass="input-label"/>
-                            <HBox spacing="6" alignment="CENTER_LEFT" maxWidth="Infinity">
-                                <children>
-                                    <!-- Se muestran de a uno: el otro queda invisible y no ocupa espacio -->
-                                    <PasswordField fx:id="txtPass"
-                                                   promptText="Ingrese su contraseña"
-                                                   HBox.hgrow="ALWAYS"
-                                                   styleClass="input"/>
+                                <!-- Usuario -->
+                                <VBox spacing="6" maxWidth="Infinity">
+                                    <children>
+                                        <Label text="Usuario *" styleClass="input-label"/>
+                                        <TextField fx:id="txtUser"
+                                                   promptText="Ingrese su usuario"
+                                                   maxWidth="Infinity" styleClass="input"/>
+                                    </children>
+                                </VBox>
 
-                                    <TextField fx:id="txtPassPlain"
-                                               promptText="Ingrese su contraseña"
-                                               visible="false" managed="false"
-                                               HBox.hgrow="ALWAYS"
-                                               styleClass="input"/>
+                                <!-- Contraseña + ojo -->
+                                <VBox spacing="6" maxWidth="Infinity">
+                                    <children>
+                                        <Label text="Contraseña *" styleClass="input-label"/>
+                                        <HBox spacing="6" alignment="CENTER_LEFT" fillHeight="true" maxWidth="Infinity">
+                                            <children>
+                                                <PasswordField fx:id="txtPass"
+                                                               promptText="Ingrese su contraseña"
+                                                               HBox.hgrow="ALWAYS"
+                                                               styleClass="input"/>
+                                                <TextField fx:id="txtPassPlain"
+                                                           promptText="Ingrese su contraseña"
+                                                           visible="false" managed="false"
+                                                           HBox.hgrow="ALWAYS"
+                                                           styleClass="input"/>
+                                                <Button fx:id="btnTogglePass"
+                                                        onAction="#togglePassword"
+                                                        focusTraversable="false"
+                                                        text="👁" styleClass="eye-btn"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
 
-                                    <Button fx:id="btnTogglePass"
-                                            onAction="#togglePassword"
-                                            focusTraversable="false"
-                                            text="👁"
-                                            styleClass="eye-btn"/>
-                                </children>
-                            </HBox>
-                        </children>
-                    </VBox>
+                                <!-- Botón ingresar -->
+                                <Button fx:id="btnLogin" text="Ingresar" onAction="#doLogin"
+                                        maxWidth="Infinity" prefHeight="44" styleClass="primary"/>
 
-                    <!-- Botón ingresar -->
-                    <Button fx:id="btnLogin" text="Ingresar" onAction="#doLogin"
-                            maxWidth="Infinity" prefHeight="44" styleClass="primary"/>
+                                <!-- Error -->
+                                <Label fx:id="lblError" text="" visible="false" managed="false" styleClass="error-msg"/>
 
-                    <!-- Mensaje de error (oculto por defecto) -->
-                    <Label fx:id="lblError" text="" visible="false" managed="false" styleClass="error-msg"/>
-
-                    <!-- Nota inferior -->
-                    <Label text="Versión académica — uso offline con base de datos MySQL"
-                           styleClass="login-footnote"/>
-                </children>
-                <padding><Insets top="0" right="36" bottom="0" left="36"/></padding>
-            </VBox>
-        </children>
-    </StackPane>
-
-</GridPane>
+                                <!-- Nota -->
+                                <Label text="Versión académica — uso offline con base de datos MySQL"
+                                       styleClass="login-footnote"/>
+                            </children>
+                            <padding><Insets left="36" right="36"/></padding>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </GridPane>
+        </ScrollPane>
+    </center>
+</BorderPane>
