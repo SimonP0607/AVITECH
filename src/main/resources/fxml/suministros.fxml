@@ -5,7 +5,8 @@
 <?import javafx.scene.text.Text?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.avitech.sia.iu.SuministrosController">
+            fx:controller="com.avitech.sia.iu.SuministrosController"
+            prefWidth="1280" prefHeight="720">
 
     <!-- ========== SIDEBAR ========== -->
     <left>
@@ -65,28 +66,28 @@
                         <!-- KPIs -->
                         <HBox spacing="12">
                             <children>
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Movimientos Hoy" styleClass="card-title"/>
                                         <Label fx:id="kpiMovHoy" text="0" styleClass="card-kpi"/>
                                         <Label text="+0" styleClass="card-delta"/>
                                     </children>
                                 </VBox>
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Productos Activos" styleClass="card-title"/>
                                         <Label fx:id="kpiActivos" text="0" styleClass="card-kpi"/>
                                         <Label text="+0" styleClass="card-delta"/>
                                     </children>
                                 </VBox>
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Stock Bajo" styleClass="card-title"/>
                                         <Label fx:id="kpiStockBajo" text="0" styleClass="card-kpi"/>
                                         <Label text="+0" styleClass="card-delta bad"/>
                                     </children>
                                 </VBox>
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Valor Total Stock" styleClass="card-title"/>
                                         <Label fx:id="kpiValor" text="+$0" styleClass="card-kpi"/>
