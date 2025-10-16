@@ -79,7 +79,7 @@
                         <!-- KPIs -->
                         <HBox spacing="12">
                             <children>
-                                <VBox styleClass="card" prefWidth="260">
+                                <VBox styleClass="card" prefWidth="260" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Aplicaciones (Mes)" styleClass="card-title"/>
                                         <Label fx:id="kpiAplicaciones" text="0" styleClass="card-kpi"/>
@@ -87,7 +87,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox styleClass="card" prefWidth="260">
+                                <VBox styleClass="card" prefWidth="260" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Mortalidad (Mes)" styleClass="card-title"/>
                                         <Label fx:id="kpiMortalidad" text="0" styleClass="card-kpi"/>
@@ -95,7 +95,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox styleClass="card" prefWidth="260">
+                                <VBox styleClass="card" prefWidth="260" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Enfermedades Activas" styleClass="card-title"/>
                                         <Label fx:id="kpiCasosActivos" text="0" styleClass="card-kpi"/>
@@ -103,7 +103,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox styleClass="card" prefWidth="260">
+                                <VBox styleClass="card" prefWidth="260" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Stock Medicamentos" styleClass="card-title"/>
                                         <Label fx:id="kpiMedStock" text="0" styleClass="card-kpi"/>
@@ -117,7 +117,7 @@
                         <HBox spacing="12">
                             <children>
                                 <!-- Planes sanitarios -->
-                                <VBox styleClass="card" prefWidth="630" VBox.vgrow="ALWAYS">
+                                <VBox styleClass="card" prefWidth="630" VBox.vgrow="ALWAYS" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Plan Sanitario y Catálogo de Medicamentos" styleClass="card-title"/>
                                         <Label text="Consulte protocolos recomendados y disponibilidad de medicamentos" styleClass="helper"/>
@@ -133,7 +133,7 @@
                                 </VBox>
 
                                 <!-- Estado de medicamentos -->
-                                <VBox styleClass="card" prefWidth="420">
+                                <VBox styleClass="card" prefWidth="420" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Estado de Medicamentos" styleClass="card-title"/>
                                         <TableView fx:id="tblMedicamentos" prefHeight="260">
