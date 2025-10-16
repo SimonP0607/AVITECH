@@ -78,7 +78,7 @@
                         <HBox spacing="12">
                             <children>
 
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Producción Total" styleClass="card-title"/>
                                         <Label fx:id="lblKpiProduccionTotal" text="—" styleClass="card-kpi"/>
@@ -86,7 +86,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Promedio Postura" styleClass="card-title"/>
                                         <Label fx:id="lblKpiPosturaPromedio" text="—" styleClass="card-kpi"/>
@@ -94,7 +94,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Peso Promedio" styleClass="card-title"/>
                                         <Label fx:id="lblKpiPesoPromedio" text="—" styleClass="card-kpi"/>
@@ -102,7 +102,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox styleClass="card" prefWidth="280">
+                                <VBox styleClass="card" prefWidth="280" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Mortalidad Total" styleClass="card-title"/>
                                         <Label fx:id="lblKpiMortalidadTotal" text="—" styleClass="card-kpi"/>
