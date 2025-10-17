@@ -12,13 +12,7 @@ import javafx.scene.layout.HBox;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Controlador base para la vista de Respaldos.
- * - Navegación lista
- * - KPIs y banner con valores dummy
- * - Tabla con acciones (descargar/restaurar/borrar)
- * Conectar a la BD más adelante.
- */
+
 public class RespaldosController {
 
     // topbar
