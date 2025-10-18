@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.suministros.MoverStockController"
+           styleClass="modal-root">
+
+    <!-- Overlay sombreado (el host ya cierra al click porque busca .modal-overlay) -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- Tarjeta del modal centrada -->
+    <BorderPane maxWidth="760" styleClass="modal-card" StackPane.alignment="CENTER">
+        <!-- Header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Mover Stock Entre Ubicaciones" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- Contenido -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="14" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+                            <!-- Nota -->
+                            <VBox styleClass="note-info">
+                                <children>
+                                    <Label text="Función:" styleClass="note-title"/>
+                                    <Label text="Transferir productos entre diferentes almacenes o ubicaciones sin afectar el stock total."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                            <!-- Formulario -->
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <Label text="Producto *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbProducto" promptText="Seleccionar producto"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Cantidad a mover *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtCantidad" promptText="0.00"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <Label text="Desde ubicación *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbDesde" promptText="Ubicación origen"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Hacia ubicación *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbHacia" promptText="Ubicación destino"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <Label text="Motivo del movimiento" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtMotivo" prefRowCount="2" promptText="Describa el motivo…"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                            </GridPane>
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="ghostBtn"/>
+                    <Button fx:id="btnMover" text="🔁  Mover Stock" styleClass="primary"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

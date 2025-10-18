@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.suministros.SalidaController"
+           styleClass="modal-root">
+
+    <!-- Overlay sombreado -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- Tarjeta del modal -->
+    <BorderPane maxWidth="760" styleClass="modal-card" StackPane.alignment="CENTER">
+        <!-- Header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Registrar Salida de Stock" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- Contenido -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="14" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+                            <Label text="Complete la información para registrar una salida de productos del inventario"
+                                   wrapText="true" styleClass="helper"/>
+
+                            <!-- Formulario -->
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <Label text="Producto *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbProducto" promptText="Seleccionar producto"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Fecha *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <DatePicker fx:id="dpFecha" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <Label text="Cantidad *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtCantidad" promptText="0.00"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Unidad *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbUnidad" promptText="Kilogramos (kg)"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <Label text="Ubicación Origen *" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbUbicacion" promptText="Almacén Principal"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Tipo de Salida *" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbTipo" promptText="Consumo / Merma / Transferencia"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                                <Label text="Destino (si Transferencia)" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbDestino" promptText="Galpón / Ubicación destino"
+                                          GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                                <Label text="Observación" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtObs" prefRowCount="2"
+                                          GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                            </GridPane>
+
+                            <!-- Detalle -->
+                            <VBox spacing="8">
+                                <children>
+                                    <Label text="Detalle" styleClass="card-title"/>
+                                    <TableView fx:id="tblDetalle" prefHeight="200">
+                                        <columns>
+                                            <TableColumn fx:id="colProd"    text="Producto" prefWidth="240"/>
+                                            <TableColumn fx:id="colCant"    text="Cantidad" prefWidth="140"/>
+                                            <TableColumn fx:id="colTipo"    text="Tipo"     prefWidth="120"/>
+                                            <TableColumn fx:id="colDestino" text="Destino"  prefWidth="160"/>
+                                        </columns>
+                                    </TableView>
+                                </children>
+                            </VBox>
+
+                            <!-- Nota -->
+                            <VBox styleClass="note-warn">
+                                <children>
+                                    <Label text="Importante:" styleClass="note-title"/>
+                                    <Label text="Al registrar esta salida, se reducirá automáticamente el stock disponible del producto. Verifique que la cantidad no exceda el stock disponible."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="ghostBtn"/>
+                    <Button fx:id="btnRegistrar" text="⬆ Registrar Salida" styleClass="primary"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

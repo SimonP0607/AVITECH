@@ -310,3 +310,55 @@
   -fx-text-fill: #6B7A73;
   -fx-font-size: 12px;
 }
+
+.modal-root {
+    -fx-alignment: center;
+}
+
+.modal-overlay {
+    -fx-background-color: rgba(0,0,0,0.45);
+}
+
+.modal-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 25, 0.25, 0, 6);
+    -fx-padding: 10;
+}
+
+.modal-footer {
+    -fx-alignment: center-right;
+    -fx-padding: 12;
+}
+
+.modal-footer .button {
+    -fx-font-weight: 600;
+    -fx-border-radius: 10;
+}
+
+.note-info {
+    -fx-background-color: #E9F3FF;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+.note-warn {
+    -fx-background-color: #FFF4E5;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+.note-danger {
+    -fx-background-color: #FFE9E9;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+.note-title { -fx-font-weight: bold; }
+
+/* Títulos y helpers (ya los venías usando) */
+.h3 { -fx-font-size: 18px; -fx-font-weight: 700; }
+.helper { -fx-text-fill: #7a869a; }
+
+/* Botones (usa tus classes existentes) */
+.primary { /* tu estilo principal verde */ }
+.ghostBtn { /* botón contorno / texto */ }
+.card { -fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12; }
+.card-title { -fx-font-weight: 600; }

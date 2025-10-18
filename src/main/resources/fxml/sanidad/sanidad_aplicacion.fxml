@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.sanidad.AplicacionController"
+           styleClass="modal">
+
+    <!-- overlay -->
+    <Rectangle StackPane.alignment="CENTER" styleClass="modal-overlay"/>
+
+    <!-- card -->
+    <BorderPane maxWidth="720" styleClass="modal-card">
+
+        <!-- header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Registrar Aplicación de Medicamento" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- body -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="14" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+
+                            <Label text="Formulario de entrada de datos" styleClass="helper"/>
+
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <!-- fila 1 -->
+                                <Label text="Fecha *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <DatePicker fx:id="dpFecha" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Lote/Galpón *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbLoteGalpon" promptText="Seleccionar lote"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <!-- fila 2 -->
+                                <Label text="Medicamento *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbMedicamento" promptText="Seleccionar medicamento"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Dosis *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtDosis" promptText="Ej: 0.3ml/ave, 1ml/L agua"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <!-- fila 3 -->
+                                <Label text="Vía de Aplicación *" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbVia" promptText="Seleccionar vía"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Responsable *" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbResponsable" promptText="Seleccionar responsable"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                                <!-- fila 4 -->
+                                <Label text="Observaciones" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtObs" prefRowCount="2"
+                                          GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                            </GridPane>
+
+                            <!-- nota -->
+                            <VBox styleClass="note-info">
+                                <children>
+                                    <Label text="Nota:" styleClass="note-title"/>
+                                    <Label text="Al registrar esta aplicación, se descontará automáticamente el medicamento del inventario según la dosis aplicada."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="ghostBtn"/>
+                    <Button fx:id="btnRegistrar" text="✎  Registrar Aplicación" styleClass="primary"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+</StackPane>

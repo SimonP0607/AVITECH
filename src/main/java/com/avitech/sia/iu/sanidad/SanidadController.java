@@ -1,10 +1,8 @@
-package com.avitech.sia.iu;
+package com.avitech.sia.iu.sanidad;
 
 
-import com.avitech.sia.iu.sanidad.RegAplicacionController;
-import com.avitech.sia.iu.sanidad.RegEventoController;
-import com.avitech.sia.iu.sanidad.dto.AplicacionDTO;
-import com.avitech.sia.iu.sanidad.dto.EventoDTO;
+import com.avitech.sia.iu.ModalUtil;
+
 
 import com.avitech.sia.App;
 import javafx.beans.property.*;
@@ -15,7 +13,7 @@ import javafx.scene.control.cell.ProgressBarTableCell;
 
 import java.time.LocalDate;
 
-public class SanidadController {
+public class SanidadController implements UsesSanidadDataSource{
 
     // Top / sidebar
     @FXML private Label lblSystemStatus, lblHeader, lblUserInfo;
@@ -96,37 +94,37 @@ public class SanidadController {
 
     @FXML
     private void onRegistrarAplicacion() {
-        // defensivo: log si el botón no está inyectado
-        // System.out.println("btnRegistrarAplicacion = " + btnRegistrarAplicacion);
-
-        RegAplicacionController ctrl = ModalUtil.openModal(
+        var ctrl = ModalUtil.openModal(
                 btnRegistrarAplicacion,
                 "/fxml/sanidad/modal_reg_aplicacion.fxml",
                 "Registrar Aplicación de Medicamento"
         );
-
-        if (ctrl != null) {
-            AplicacionDTO dto = ctrl.getResult();
-            if (dto != null) {
-                System.out.println("Aplicación guardada: " + dto);
-                // TODO: persistir y refrescar listas/KPIs
+        if (ctrl != null && ctrl.getResult() != null) {
+            try {
+                long id = sanidadDs().saveAplicacion(ctrl.getResult());
+                System.out.println("Aplicación guardada con id=" + id);
+                // TODO: refrescar KPIs/tabla si aplica
+            } catch (Exception ex) {
+                new Alert(Alert.AlertType.ERROR,
+                        "Error guardando aplicación: " + ex.getMessage()).showAndWait();
             }
         }
     }
 
     @FXML
     private void onRegistrarEvento() {
-        RegEventoController ctrl = ModalUtil.openModal(
+        var ctrl = ModalUtil.openModal(
                 btnRegistrarEvento,
                 "/fxml/sanidad/modal_reg_evento.fxml",
                 "Registrar Evento Sanitario"
         );
-
-        if (ctrl != null) {
-            EventoDTO dto = ctrl.getResult();
-            if (dto != null) {
-                System.out.println("Evento guardado: " + dto);
-                // TODO: persistir y refrescar listas/KPIs
+        if (ctrl != null && ctrl.getResult() != null) {
+            try {
+                long id = sanidadDs().saveEvento(ctrl.getResult());
+                System.out.println("Evento guardado con id=" + id);
+            } catch (Exception ex) {
+                new Alert(Alert.AlertType.ERROR,
+                        "Error guardando evento: " + ex.getMessage()).showAndWait();
             }
         }
     }

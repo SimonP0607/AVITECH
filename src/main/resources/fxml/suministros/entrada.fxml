@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Modal con overlay (colócalo dentro del overlayHost del SuministrosController) -->
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.suministros.EntradaController"
+           styleClass="modal-root">
+
+    <!-- Fondo semitransparente (clic para cerrar, el host ya busca .modal-overlay) -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- Tarjeta del modal, centrada -->
+    <BorderPane maxWidth="760" styleClass="modal-card" StackPane.alignment="CENTER">
+        <!-- Header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Registrar Entrada de Stock" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- Contenido con scroll -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="14" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+                            <Label text="Complete la información para registrar una nueva entrada de productos al inventario"
+                                   wrapText="true" styleClass="helper"/>
+
+                            <!-- Formulario -->
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <Label text="Producto *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbProducto" promptText="Seleccionar producto"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Fecha *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <DatePicker fx:id="dpFecha" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <Label text="Cantidad *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtCantidad" promptText="0.00"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Unidad *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbUnidad" promptText="Kilogramos (kg)"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <Label text="Ubicación *" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbUbicacion" promptText="Almacén Principal"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Proveedor" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtProveedor" promptText="Nombre del proveedor"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                                <Label text="Número de Lote" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtLote" promptText="LOT-2024-001"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                <Label text="(Opcional – para trazabilidad del producto)"
+                                       styleClass="helper" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="2"/>
+
+                                <Label text="Observación" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtObs" prefRowCount="2"
+                                          GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                            </GridPane>
+
+                            <!-- Detalle de ítems de la entrada -->
+                            <VBox spacing="8">
+                                <children>
+                                    <Label text="Detalle" styleClass="card-title"/>
+                                    <TableView fx:id="tblDetalle" prefHeight="200">
+                                        <columns>
+                                            <TableColumn fx:id="colProd"  text="Producto" prefWidth="240"/>
+                                            <TableColumn fx:id="colCant"  text="Cantidad" prefWidth="120"/>
+                                            <TableColumn fx:id="colCosto" text="Costo"    prefWidth="110"/>
+                                            <TableColumn fx:id="colLote"  text="Lote"     prefWidth="120"/>
+                                            <TableColumn fx:id="colVence" text="Vence"    prefWidth="120"/>
+                                        </columns>
+                                    </TableView>
+                                </children>
+                            </VBox>
+
+                            <!-- Nota -->
+                            <VBox styleClass="note-info">
+                                <children>
+                                    <Label text="Nota:" styleClass="note-title"/>
+                                    <Label text="Al registrar esta entrada, se actualizará automáticamente el stock disponible del producto."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="ghostBtn"/>
+                    <Button fx:id="btnRegistrar" text="⬇ Registrar Entrada" styleClass="primary"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

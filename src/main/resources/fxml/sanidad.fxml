@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.ProgressBarTableCell?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.avitech.sia.iu.SanidadController"
+            fx:id="root"
+            fx:controller="com.avitech.sia.iu.sanidad.SanidadController"
             prefWidth="1920" prefHeight="1080">
 
-    <!-- SIDEBAR (igual al dashboard) -->
+    <!-- SIDEBAR -->
     <left>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="270" styleClass="side-scroll">
             <content>
@@ -57,23 +56,25 @@
 
     <!-- CONTENIDO -->
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
             <content>
-                <VBox spacing="18" styleClass="content">
+                <VBox spacing="18" styleClass="content" fillWidth="true" maxWidth="Infinity">
                     <children>
+
+                        <!-- Título + acciones -->
                         <HBox alignment="CENTER_LEFT" spacing="12">
                             <children>
                                 <Label text="Control Sanitario" styleClass="h2"/>
                                 <Label text="Gestión integral de salud, medicamentos y eventos sanitarios" styleClass="helper"/>
                                 <Pane HBox.hgrow="ALWAYS"/>
-                                <Button text="Registrar Aplicación"
-                                        fx:id="btnRegistrarAplicacion"
-                                        onAction="#onRegistrarAplicacion"
-                                        />
-                                <Button text="Registrar Evento"
-                                        fx:id="btnRegistrarEvento"
-                                        onAction="#onRegistrarEvento"
-                                        />
+                                <Button fx:id="btnRegistrarAplicacion"
+                                        text="➕ Registrar Aplicación"
+                                        styleClass="primary"
+                                        onAction="#onRegistrarAplicacion"/>
+                                <Button fx:id="btnRegistrarEvento"
+                                        text="🩺 Registrar Evento"
+                                        styleClass="secondary"
+                                        onAction="#onRegistrarEvento"/>
                             </children>
                         </HBox>
 
@@ -194,5 +195,4 @@
             </content>
         </ScrollPane>
     </center>
-
 </BorderPane>

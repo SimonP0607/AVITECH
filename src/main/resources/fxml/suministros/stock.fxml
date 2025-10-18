@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.suministros.StockController"
+           styleClass="modal-root">
+
+    <!-- Overlay sombreado -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- Tarjeta del modal -->
+    <BorderPane maxWidth="860" styleClass="modal-card" StackPane.alignment="CENTER">
+        <!-- Header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Registro de Stock Actual" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- Contenido -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="14" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+                            <Label text="Resumen general del inventario de todos los productos" styleClass="helper"/>
+
+                            <!-- Tarjetas de producto (decorativas / opcional) -->
+                            <TilePane hgap="12" vgap="12" prefTileWidth="260" prefRows="2">
+                                <children>
+                                    <VBox styleClass="card" maxWidth="260">
+                                        <children>
+                                            <Label text="Concentrado Ponedoras" styleClass="card-title"/>
+                                            <Label text="Stock: —"/>
+                                            <Label text="Mínimo: —"/>
+                                            <Label text="Ubicación: —"/>
+                                            <Button text="Ver Historial" styleClass="ghostBtn"/>
+                                        </children>
+                                    </VBox>
+                                    <VBox styleClass="card" maxWidth="260">
+                                        <children>
+                                            <Label text="Vitamina E + Selenio" styleClass="card-title"/>
+                                            <Label text="Stock: —"/>
+                                            <Label text="Mínimo: —"/>
+                                            <Label text="Ubicación: —"/>
+                                            <Button text="Ver Historial" styleClass="ghostBtn"/>
+                                        </children>
+                                    </VBox>
+                                    <VBox styleClass="card" maxWidth="260">
+                                        <children>
+                                            <Label text="Desinfectante Ambiental" styleClass="card-title"/>
+                                            <Label text="Stock: —"/>
+                                            <Label text="Mínimo: —"/>
+                                            <Label text="Ubicación: —"/>
+                                            <Button text="Ver Historial" styleClass="ghostBtn"/>
+                                        </children>
+                                    </VBox>
+                                    <VBox styleClass="card" maxWidth="260">
+                                        <children>
+                                            <Label text="Suplemento Mineral" styleClass="card-title"/>
+                                            <Label text="Stock: —"/>
+                                            <Label text="Mínimo: —"/>
+                                            <Label text="Ubicación: —"/>
+                                            <Button text="Ver Historial" styleClass="ghostBtn"/>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </TilePane>
+
+                            <!-- Filtros -->
+                            <VBox styleClass="card">
+                                <children>
+                                    <Label text="Filtros" styleClass="card-title"/>
+                                    <GridPane hgap="10" vgap="10">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50"/>
+                                            <ColumnConstraints percentWidth="25"/>
+                                            <ColumnConstraints percentWidth="25"/>
+                                        </columnConstraints>
+
+                                        <Label text="Buscar" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="txtBuscar" promptText="Código o nombre…" GridPane.columnIndex="0"/>
+
+                                        <Label text="Categoría" GridPane.columnIndex="1"/>
+                                        <ComboBox fx:id="cbCategoria" GridPane.columnIndex="1"/>
+
+                                        <Label text="Ubicación" GridPane.columnIndex="2"/>
+                                        <ComboBox fx:id="cbUbicacion" GridPane.columnIndex="2"/>
+                                    </GridPane>
+
+                                    <HBox spacing="10" style="-fx-padding: 8 0 0 0;">
+                                        <children>
+                                            <Button text="Ver alertas de stock bajo" onAction="#verAlertasBajo" styleClass="ghostBtn"/>
+                                            <Pane HBox.hgrow="ALWAYS"/>
+                                            <Button text="Exportar CSV" onAction="#exportCsv" styleClass="secondary"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+
+                            <!-- Tabla de stock -->
+                            <VBox styleClass="card">
+                                <children>
+                                    <Label text="Detalle de Stock" styleClass="card-title"/>
+                                    <TableView fx:id="tblStock" prefHeight="260">
+                                        <columns>
+                                            <TableColumn fx:id="colCodigo" text="Código" prefWidth="90"/>
+                                            <TableColumn fx:id="colNombre" text="Nombre" prefWidth="220"/>
+                                            <TableColumn fx:id="colCat"    text="Categoría" prefWidth="120"/>
+                                            <TableColumn fx:id="colLote"   text="Lote" prefWidth="100"/>
+                                            <TableColumn fx:id="colVence"  text="Vence" prefWidth="100"/>
+                                            <TableColumn fx:id="colUbic"   text="Ubicación" prefWidth="150"/>
+                                            <TableColumn fx:id="colDisp"   text="Disponible" prefWidth="110"/>
+                                            <TableColumn fx:id="colMin"    text="Mínimo" prefWidth="90"/>
+                                        </columns>
+                                    </TableView>
+
+                                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                                        <children>
+                                            <Label fx:id="lblTotalItems" text="Total ítems: 0" styleClass="helper"/>
+                                            <Label fx:id="lblTotalCant" text="Cantidad total: 0" styleClass="helper"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+
+                            <!-- Alerta de stock bajo -->
+                            <VBox styleClass="note-danger">
+                                <children>
+                                    <Label text="Productos con Stock Bajo" styleClass="note-title"/>
+                                    <ListView fx:id="listStockBajo" prefHeight="120"/>
+                                </children>
+                            </VBox>
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnClose" text="Cerrar" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.sanidad.EventoController"
+           styleClass="modal">
+
+    <!-- overlay -->
+    <Rectangle StackPane.alignment="CENTER" styleClass="modal-overlay"/>
+
+    <!-- card -->
+    <BorderPane maxWidth="720" styleClass="modal-card">
+
+        <!-- header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Registrar Evento Sanitario" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- body -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="14" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+
+                            <Label text="Formulario de entrada de datos" styleClass="helper"/>
+
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <!-- fila 1 -->
+                                <Label text="Fecha *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <DatePicker fx:id="dpFecha" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Lote/Galpón Afectado *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbLoteGalpon" promptText="Seleccionar lote"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <!-- fila 2 -->
+                                <Label text="Tipo de Evento *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbTipoEvento" promptText="Enfermedad / Mortalidad / Otro"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Aves Afectadas *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtAvesAfectadas" promptText="Número de aves"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <!-- fila 3 -->
+                                <Label text="Descripción del Evento *" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtDescripcion" prefRowCount="2"
+                                          promptText="Describa el evento, síntomas observados, etc."
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                                <!-- fila 4 -->
+                                <Label text="Acciones Tomadas" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtAcciones" prefRowCount="2"
+                                          promptText="Medidas/acciones implementadas"
+                                          GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                                <!-- fila 5 -->
+                                <Label text="Responsable del Reporte *" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbResponsable" promptText="Seleccionar responsable"
+                                          GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                            </GridPane>
+
+                            <!-- nota -->
+                            <VBox styleClass="note-warn">
+                                <children>
+                                    <Label text="Importante:" styleClass="note-title"/>
+                                    <Label text="Los eventos sanitarios son registrados para seguimiento estadístico y toma de decisiones. Asegúrese de proporcionar información precisa."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="ghostBtn"/>
+                    <Button fx:id="btnRegistrar" text="⚠  Registrar Evento" styleClass="primary"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+</StackPane>
