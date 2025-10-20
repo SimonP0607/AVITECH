@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Rectangle?>
 
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="modalRoot"
            fx:controller="com.avitech.sia.iu.sanidad.AplicacionController"
-           styleClass="modal">
+           styleClass="modal-root">
 
     <!-- overlay -->
-    <Rectangle StackPane.alignment="CENTER" styleClass="modal-overlay"/>
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
 
-    <!-- card -->
-    <BorderPane maxWidth="720" styleClass="modal-card">
+    <!-- card (responsive: ancho/alto ligados al root con topes) -->
+    <BorderPane
+            minWidth="520"
+            prefWidth="${modalRoot.width - 96}"
+            maxWidth="860"
+            minHeight="340"
+            prefHeight="${modalRoot.height - 96}"
+            maxHeight="700"
+            styleClass="modal-card"
+            StackPane.alignment="CENTER">
 
         <!-- header -->
         <top>
@@ -28,7 +35,7 @@
             </HBox>
         </top>
 
-        <!-- body -->
+        <!-- body con scroll -->
         <center>
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
                 <content>
@@ -103,6 +110,5 @@
                 <padding><Insets topRightBottomLeft="12"/></padding>
             </HBox>
         </bottom>
-
     </BorderPane>
 </StackPane>

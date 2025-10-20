@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Rectangle?>
 
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="modalRoot"
            fx:controller="com.avitech.sia.iu.sanidad.EventoController"
-           styleClass="modal">
+           styleClass="modal-root">
 
-    <!-- overlay -->
-    <Rectangle StackPane.alignment="CENTER" styleClass="modal-overlay"/>
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
 
-    <!-- card -->
-    <BorderPane maxWidth="720" styleClass="modal-card">
+    <BorderPane
+            minWidth="520"
+            prefWidth="${modalRoot.width - 96}"
+            maxWidth="860"
+            minHeight="360"
+            prefHeight="${modalRoot.height - 96}"
+            maxHeight="740"
+            styleClass="modal-card"
+            StackPane.alignment="CENTER">
 
-        <!-- header -->
         <top>
             <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
                 <children>
@@ -28,7 +32,6 @@
             </HBox>
         </top>
 
-        <!-- body -->
         <center>
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
                 <content>
@@ -80,7 +83,6 @@
                                           GridPane.rowIndex="4" GridPane.columnIndex="1"/>
                             </GridPane>
 
-                            <!-- nota -->
                             <VBox styleClass="note-warn">
                                 <children>
                                     <Label text="Importante:" styleClass="note-title"/>
@@ -96,7 +98,6 @@
             </ScrollPane>
         </center>
 
-        <!-- footer -->
         <bottom>
             <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
                 <children>
@@ -106,6 +107,5 @@
                 <padding><Insets topRightBottomLeft="12"/></padding>
             </HBox>
         </bottom>
-
     </BorderPane>
 </StackPane>

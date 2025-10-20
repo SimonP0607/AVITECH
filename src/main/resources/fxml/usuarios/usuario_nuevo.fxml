@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.avitech.sia.iu.usuarios.NuevoUsuarioController"
+           styleClass="modal-root">
+
+    <!-- margen para evitar que el modal pegue a los bordes -->
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12"/>
+    </padding>
+
+    <!-- overlay -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- tarjeta -->
+    <BorderPane prefWidth="720" maxWidth="820" styleClass="modal-card" StackPane.alignment="CENTER">
+        <!-- Header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label text="Crear Nuevo Usuario" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <!-- tamaño fijo razonable para el cerrar -->
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"
+                            minWidth="32" prefWidth="32" maxWidth="32"
+                            minHeight="32" prefHeight="32" maxHeight="32"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- Body -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="16" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+
+                        <!-- Datos básicos -->
+                        <VBox spacing="10" styleClass="card">
+                            <children>
+                                <Label text="Datos Básicos" styleClass="card-title"/>
+                                <GridPane hgap="12" vgap="10">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="160"/>
+                                        <ColumnConstraints hgrow="ALWAYS"/>
+                                        <ColumnConstraints minWidth="160"/>
+                                        <ColumnConstraints hgrow="ALWAYS"/>
+                                    </columnConstraints>
+
+                                    <Label text="Nombre Completo *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="tfNombre" promptText="Ej: María José González"
+                                               styleClass="input" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                    <Label text="Nombre de Usuario *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                    <TextField fx:id="tfUsuario" promptText="Ej: @mgonzalez"
+                                               styleClass="input" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                    <Label text="Contraseña *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <PasswordField fx:id="pfPwd" promptText="Contraseña segura"
+                                                   styleClass="input" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                    <Label text="Confirmar Contraseña *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                    <PasswordField fx:id="pfPwd2" promptText="Repetir contraseña"
+                                                   styleClass="input" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                    <Label text="Estado" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <ComboBox fx:id="cbEstado" promptText="Activo"
+                                              GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                        <!-- Rol base -->
+                        <VBox spacing="10" styleClass="card">
+                            <children>
+                                <Label text="Rol Base" styleClass="card-title"/>
+                                <GridPane hgap="12" vgap="10">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="160"/>
+                                        <ColumnConstraints hgrow="ALWAYS"/>
+                                        <ColumnConstraints minWidth="160"/>
+                                        <ColumnConstraints hgrow="ALWAYS"/>
+                                    </columnConstraints>
+
+                                    <Label text="Seleccionar Rol *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <ComboBox fx:id="cbRol" promptText="Seleccionar rol base"
+                                              GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                    <Label text="Descripción del rol:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <TextArea fx:id="taRolDesc" prefRowCount="2"
+                                              promptText="Descripción breve de permisos del rol"
+                                              GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer">
+                <children>
+                    <!-- NO usar Region.USE_PREF_SIZE en FXML -->
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="ghostBtn"
+                            minWidth="-1" maxWidth="-1"/>
+                    <Button fx:id="btnCrear" text="✓  Crear Usuario" styleClass="primary"
+                            minWidth="-1" maxWidth="-1" prefHeight="36"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>
