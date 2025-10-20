@@ -1,6 +1,6 @@
 package com.avitech.sia.iu;
 
-import com.avitech.sia.App; // usa el mismo helper de navegación que ya tienes
+import com.avitech.sia.App;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,11 +11,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Controller base para la vista de Alertas.
- * Deja lista la navegación, filtros mínimos y la tabla con una columna de acción.
- * La carga real desde BD se conecta más adelante.
- */
 public class AlertasController {
 
     /* ====== sidebar / topbar ====== */
@@ -51,16 +46,17 @@ public class AlertasController {
     @FXML private Label lblResCritico, lblResBajo, lblResAdvertencia;
     @FXML private Label lblBanner;
 
-    private final ObservableList<ItemAlerta> master = FXCollections.observableArrayList();
+    private final ObservableList<ItemAlerta> master   = FXCollections.observableArrayList();
     private final ObservableList<ItemAlerta> filtered = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
         lblHeader.setText("Administrador");
+        lblUserInfo.setText("Administrador");
 
-        // Combos dummy
-        cbCategoria.setItems(FXCollections.observableArrayList("Todas", "Alimentos", "Medicamentos", "Limpieza", "Vacunas", "Suplem."));
+        // Combos (placeholder hasta BD)
+        cbCategoria.setItems(FXCollections.observableArrayList("Todas", "Alimentos", "Medicamentos", "Limpieza", "Vacunas", "Suplementos"));
         cbCriticidad.setItems(FXCollections.observableArrayList("Todas", "Crítico", "Bajo", "Advertencia"));
         cbUbicacion.setItems(FXCollections.observableArrayList("Todas", "Almacén Principal", "Farmacia", "Almacén Secundario", "Patio de Materiales"));
 
@@ -68,7 +64,7 @@ public class AlertasController {
         cbCriticidad.getSelectionModel().selectFirst();
         cbUbicacion.getSelectionModel().selectFirst();
 
-        // Tabla
+        // Columnas
         colArticulo.setCellValueFactory(new PropertyValueFactory<>("articulo"));
         colCategoria.setCellValueFactory(new PropertyValueFactory<>("categoria"));
         colStockActual.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
@@ -77,28 +73,32 @@ public class AlertasController {
         colDias.setCellValueFactory(new PropertyValueFactory<>("diasRestantes"));
         colUbicacion.setCellValueFactory(new PropertyValueFactory<>("ubicacion"));
 
-        // Columna de acción con botón "Ir al ítem"
-        colAccion.setCellValueFactory(param -> new SimpleStringProperty("Ir al ítem"));
+        // Columna Acciones con link
+        colAccion.setCellValueFactory(p -> new SimpleStringProperty("Ir al ítem"));
         colAccion.setCellFactory(col -> new TableCell<>() {
             private final Hyperlink link = new Hyperlink("Ir al ítem");
-            { link.setOnAction(e -> onGoItem(getTableView().getItems().get(getIndex()))); }
+            {
+                link.getStyleClass().add("ghostBtn");
+                link.setOnAction(e -> {
+                    ItemAlerta it = getTableView().getItems().get(getIndex());
+                    onGoItem(it);
+                });
+            }
             @Override protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
-                setGraphic(empty ? null : link);
                 setText(null);
+                setGraphic(empty ? null : link);
             }
         });
 
-        // Datos de ejemplo (hasta conectar BD)
+        // Datos demo (quitar cuando conectes BD)
         seedSample();
 
-        // Mostrar filtrado inicial
+        // Filtrado inicial + KPIs
         applyFilter();
-
-        // KPIs
         refreshKpis();
 
-        // Fecha de actualización
+        // Fecha/hora de actualización
         lblActualizado.setText("Actualizado: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
     }
 
@@ -113,29 +113,23 @@ public class AlertasController {
     @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml", "SIA Avitech — Usuarios"); }
     @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
-    @FXML private void onExit() {      App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");}
+    @FXML private void onExit()       { App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión"); }
 
     /* ================== Acciones UI ================== */
-
-    @FXML
-    private void onRefresh() {
-        // En real: recargar desde servicio/DAO y recalcular KPIs.
+    @FXML private void onRefresh() {
         applyFilter();
         refreshKpis();
         lblActualizado.setText("Actualizado: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
     }
 
-    @FXML
-    private void onVerCriticos() {
+    @FXML private void onVerCriticos() {
         cbCriticidad.getSelectionModel().select("Crítico");
         applyFilter();
     }
 
-    @FXML
-    private void onAplicarFiltros() { applyFilter(); }
+    @FXML private void onAplicarFiltros() { applyFilter(); }
 
-    @FXML
-    private void onLimpiarFiltros() {
+    @FXML private void onLimpiarFiltros() {
         txtSearch.clear();
         cbCategoria.getSelectionModel().selectFirst();
         cbCriticidad.getSelectionModel().selectFirst();
@@ -144,22 +138,22 @@ public class AlertasController {
     }
 
     private void onGoItem(ItemAlerta item) {
-        // En real: navegación al detalle del artículo en Suministros con el ID.
+        // En real: ir al detalle del ítem (por ID) en Suministros
         goSupplies();
     }
 
-    /* ================== Lógica local (dummy) ================== */
+    /* ================== Lógica local (demo) ================== */
 
     private void seedSample() {
         master.setAll(
-                new ItemAlerta("Alimento Balanceado Postura", "Alimentos", "450 kg", "1000 kg", "45%", "2 días", "Almacén Principal", "Crítico"),
-                new ItemAlerta("Enrofloxacina 10%", "Medicamentos", "20 frascos", "40 frascos", "50%", "15 días", "Farmacia", "Bajo"),
-                new ItemAlerta("Vitaminas AD3E", "Vitaminas", "12 frascos", "25 frascos", "48%", "8 días", "Farmacia", "Bajo"),
-                new ItemAlerta("Alimento Pre-inicio", "Alimentos", "75 kg", "200 kg", "38%", "4 días", "Almacén Secundario", "Crítico"),
-                new ItemAlerta("Desinfectante Clorado", "Limpieza", "30 litros", "50 litros", "60%", "12 días", "Almacén de Químicos", "Advertencia"),
-                new ItemAlerta("Vacuna Newcastle", "Vacunas", "100 dosis", "450 dosis", "22%", "6 días", "Refrigerador Farmacia", "Crítico"),
-                new ItemAlerta("Vitro para Carne", "Molinos", "20 sacos", "80 sacos", "25%", "3 días", "Patio de Materiales", "Crítico"),
-                new ItemAlerta("Probióticos", "Suplementos", "6 envases", "15 envases", "40%", "10 días", "Farmacia", "Bajo")
+                new ItemAlerta("Alimento Balanceado Postura", "Alimentos", "450 kg", "1000 kg", "45%", "2 días",  "Almacén Principal",   "Crítico"),
+                new ItemAlerta("Enrofloxacina 10%",           "Medicamentos", "20 frascos", "40 frascos", "50%", "15 días", "Farmacia",           "Bajo"),
+                new ItemAlerta("Vitaminas AD3E",              "Suplementos",  "12 frascos", "25 frascos", "48%", "8 días",  "Farmacia",           "Bajo"),
+                new ItemAlerta("Alimento Pre-inicio",         "Alimentos",    "75 kg",      "200 kg",     "38%", "4 días",  "Almacén Secundario", "Crítico"),
+                new ItemAlerta("Desinfectante Clorado",       "Limpieza",     "30 l",       "50 l",       "60%", "12 días", "Almacén de Químicos","Advertencia"),
+                new ItemAlerta("Vacuna Newcastle",            "Vacunas",      "100 dosis",  "450 dosis",  "22%", "6 días",  "Refrigerador",       "Crítico"),
+                new ItemAlerta("Vitro para Carne",            "Alimentos",    "20 sacos",   "80 sacos",   "25%", "3 días",  "Patio de Materiales","Crítico"),
+                new ItemAlerta("Probióticos",                 "Suplementos",  "6 envases",  "15 envases", "40%", "10 días", "Farmacia",           "Bajo")
         );
     }
 
@@ -170,10 +164,13 @@ public class AlertasController {
         String ubi  = sel(cbUbicacion);
 
         filtered.setAll(master.filtered(it ->
-                (text.isEmpty() || it.articulo.toLowerCase().contains(text) || it.categoria.toLowerCase().contains(text) || it.ubicacion.toLowerCase().contains(text)) &&
-                        (cat.equals("Todas") || it.categoria.equalsIgnoreCase(cat)) &&
-                        (cri.equals("Todas") || it.nivel.equalsIgnoreCase(cri)) &&
-                        (ubi.equals("Todas") || it.ubicacion.equalsIgnoreCase(ubi))
+                (text.isEmpty()
+                        || it.articulo.toLowerCase().contains(text)
+                        || it.categoria.toLowerCase().contains(text)
+                        || it.ubicacion.toLowerCase().contains(text))
+                        && ("Todas".equals(cat) || it.categoria.equalsIgnoreCase(cat))
+                        && ("Todas".equals(cri) || it.nivel.equalsIgnoreCase(cri))
+                        && ("Todas".equals(ubi) || it.ubicacion.equalsIgnoreCase(ubi))
         ));
 
         tblAlertas.setItems(filtered);
@@ -181,7 +178,7 @@ public class AlertasController {
     }
 
     private String sel(ComboBox<String> cb) {
-        var s = cb.getSelectionModel().getSelectedItem();
+        String s = cb.getSelectionModel().getSelectedItem();
         return (s == null) ? "Todas" : s;
     }
 
@@ -202,14 +199,19 @@ public class AlertasController {
         lblBanner.setText(crit + " artículo(s) en stock crítico requieren atención inmediata");
     }
 
-    /* ================== DTO sencillo para la tabla ================== */
+    /* ================== DTO de fila ================== */
     public static class ItemAlerta {
         public final String articulo, categoria, stockActual, stockMinimo, porcentaje, diasRestantes, ubicacion, nivel;
         public ItemAlerta(String articulo, String categoria, String stockActual, String stockMinimo,
                           String porcentaje, String diasRestantes, String ubicacion, String nivel) {
-            this.articulo = articulo; this.categoria = categoria; this.stockActual = stockActual;
-            this.stockMinimo = stockMinimo; this.porcentaje = porcentaje; this.diasRestantes = diasRestantes;
-            this.ubicacion = ubicacion; this.nivel = nivel;
+            this.articulo = articulo;
+            this.categoria = categoria;
+            this.stockActual = stockActual;
+            this.stockMinimo = stockMinimo;
+            this.porcentaje = porcentaje;
+            this.diasRestantes = diasRestantes;
+            this.ubicacion = ubicacion;
+            this.nivel = nivel;
         }
         public String getArticulo() { return articulo; }
         public String getCategoria() { return categoria; }
