@@ -1,6 +1,7 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.db.AuditoriaDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,8 +10,6 @@ import javafx.scene.control.*;
 import javafx.util.Callback;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class AuditoriaController {
 
@@ -83,8 +82,14 @@ public class AuditoriaController {
         // Botón "Ver Fuente"
         colVer.setCellFactory(makeVerFuenteCell());
 
-        // Datos demo (placeholders)
-        seedDemo();
+        // Cargar datos desde la BD
+        try {
+            master.setAll(AuditoriaDAO.getAll());
+            tvAuditoria.setItems(master);
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los datos de auditoría: " + e.getMessage()).showAndWait();
+        }
 
         // KPIs
         refreshKpis();
@@ -166,23 +171,6 @@ public class AuditoriaController {
     }
 
     /* ====== Helpers ====== */
-
-    private void seedDemo() {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss");
-
-        master.setAll(
-                new AuditoriaDTO("María González", LocalDateTime.now().minusMinutes(8).format(fmt), "Ver",       "Alertas",
-                        "Consultó lista de alertas de stock bajo · ID: ALT-2024-000156", "ALT-2024-000156"),
-                new AuditoriaDTO("Carlos Ruiz",     LocalDateTime.now().minusMinutes(42).format(fmt), "Modificar", "Sanitario",
-                        "Actualizó estado de tratamiento SAN-2024-000451 a completado · ID: SAN-2024-000451", "SAN-2024-000451"),
-                new AuditoriaDTO("Ana Mendoza",     LocalDateTime.now().minusHours(3).format(fmt), "Crear",    "Reportes",
-                        "Generó reporte de producción por lote/semana · ID: REP-2024-000012", "REP-2024-000012"),
-                new AuditoriaDTO("Sistema",         LocalDateTime.now().minusHours(5).format(fmt), "Login",    "Login",
-                        "Inicio automático de rutina nocturna", "SYS-LOGIN")
-        );
-
-        tvAuditoria.setItems(master);
-    }
 
     private void refreshKpis() {
         int total = tvAuditoria.getItems() == null ? 0 : tvAuditoria.getItems().size();
