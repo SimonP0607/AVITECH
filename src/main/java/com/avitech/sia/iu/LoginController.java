@@ -1,6 +1,8 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.db.UsuarioDAO;
+import com.avitech.sia.db.PasswordUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -79,23 +81,34 @@ public class LoginController {
             return;
         }
 
-        // DEMO: credenciales por defecto (puedes reemplazar por consulta a BD)
-        if (user.equals("admin") && pass.equals("admin123")) {
-            // Navega al dashboard de ADMIN
-            App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN");
-            return;
-        }
-        if (user.equals("supervisor") && pass.equals("super123")) {
-            // Si ya tienes el FXML del supervisor, cámbialo aquí:
-            // App.goTo("/fxml/dashboard_supervisor.fxml", "SIA Avitech — SUPERVISOR");
-            App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — SUPERVISOR (demo)");
-            return;
-        }
-        if (user.equals("operador") && pass.equals("oper123")) {
-            // Si ya tienes el FXML del operador, cámbialo aquí:
-            // App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — OPERADOR");
-            App.goTo("/fxml/dashboard_super.fxml", "SIA Avitech — OPERADOR (demo)");
-            return;
+        try {
+            var optUsuario = UsuarioDAO.findByUsuario(user);
+
+            if (optUsuario.isPresent()) {
+                UsuarioDAO.Usuario u = optUsuario.get();
+                // Usamos BCrypt para verificar el hash de la contraseña
+                if (PasswordUtil.check(pass, u.passHash())) {
+                    // TODO: Guardar usuario en sesión global
+                    String rol = u.rol().toUpperCase();
+                    switch (rol) {
+                        case "ADMIN":
+                            App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN");
+                            break;
+                        case "SUPERVISOR":
+                            App.goTo("/fxml/dashboard_super.fxml", "SIA Avitech — SUPERVISOR");
+                            break;
+                        case "OPERADOR":
+                            App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — OPERADOR");
+                            break;
+                        default:
+                            showError("Rol de usuario no reconocido: " + u.rol());
+                    }
+                    return; // Salir del método si el login es exitoso
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("Error al conectar con la base de datos.");
         }
 
         showError("Usuario o contraseña incorrectos.");

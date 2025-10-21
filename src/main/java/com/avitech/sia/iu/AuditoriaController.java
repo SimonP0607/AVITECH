@@ -2,6 +2,7 @@ package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
 import com.avitech.sia.db.AuditoriaDAO;
+import com.avitech.sia.db.UsuarioDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.util.Callback;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class AuditoriaController {
 
@@ -33,19 +35,18 @@ public class AuditoriaController {
     @FXML private TextField txtBuscar;
 
     /* ===== Tabla principal ===== */
-    @FXML private TableView<AuditoriaDTO> tvAuditoria;
-    @FXML private TableColumn<AuditoriaDTO, String> colUsuario;
-    @FXML private TableColumn<AuditoriaDTO, String> colFecha;
-    @FXML private TableColumn<AuditoriaDTO, String> colAccion;
-    @FXML private TableColumn<AuditoriaDTO, String> colModulo;
-    @FXML private TableColumn<AuditoriaDTO, String> colDetalle;
-    @FXML private TableColumn<AuditoriaDTO, String> colVer;
+    @FXML private TableView<AuditoriaDAO.AuditoriaDTO> tvAuditoria;
+    @FXML private TableColumn<AuditoriaDAO.AuditoriaDTO, String> colUsuario;
+    @FXML private TableColumn<AuditoriaDAO.AuditoriaDTO, String> colFecha;
+    @FXML private TableColumn<AuditoriaDAO.AuditoriaDTO, String> colAccion;
+    @FXML private TableColumn<AuditoriaDAO.AuditoriaDTO, String> colModulo;
+    @FXML private TableColumn<AuditoriaDAO.AuditoriaDTO, String> colDetalle;
+    @FXML private TableColumn<AuditoriaDAO.AuditoriaDTO, String> colVer;
 
     /* ===== Resúmenes ===== */
     @FXML private ListView<String> lvActividadModulo;
     @FXML private ListView<String> lvActividadUsuario;
-
-    private final ObservableList<AuditoriaDTO> master = FXCollections.observableArrayList();
+    private final ObservableList<AuditoriaDAO.AuditoriaDTO> master = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -57,10 +58,16 @@ public class AuditoriaController {
         dpInicio.setValue(LocalDate.now().minusDays(7));
         dpFin.setValue(LocalDate.now());
 
-        cboUsuario.setItems(FXCollections.observableArrayList(
-                "Todos los usuarios", "María González", "Carlos Ruiz", "Ana Mendoza", "Sistema"
-        ));
-        cboUsuario.getSelectionModel().selectFirst();
+        try {
+            var usuarios = new ArrayList<String>();
+            usuarios.add("Todos los usuarios");
+            usuarios.addAll(UsuarioDAO.getAllUsernames());
+            cboUsuario.setItems(FXCollections.observableArrayList(usuarios));
+            cboUsuario.getSelectionModel().selectFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+            cboUsuario.setItems(FXCollections.observableArrayList("Todos los usuarios"));
+        }
 
         cboModulo.setItems(FXCollections.observableArrayList(
                 "Todos los módulos", "Producción", "Suministros", "Sanitario", "Reportes", "Alertas", "Usuarios", "Parámetros", "Login", "Respaldos"
@@ -121,7 +128,7 @@ public class AuditoriaController {
         String m = cboModulo.getValue();
         String a = cboAccion.getValue();
 
-        ObservableList<AuditoriaDTO> filtered = master.filtered(it -> {
+        ObservableList<AuditoriaDAO.AuditoriaDTO> filtered = master.filtered(it -> {
             boolean byUser = "Todos los usuarios".equals(u) || it.usuario().equals(u);
             boolean byMod  = "Todos los módulos".equals(m)  || it.modulo().equals(m);
             boolean byAct  = "Todas las acciones".equals(a) || it.accion().equals(a);
@@ -184,13 +191,13 @@ public class AuditoriaController {
         lblActivos.setText(String.valueOf(activos));
     }
 
-    private Callback<TableColumn<AuditoriaDTO, String>, TableCell<AuditoriaDTO, String>> makeVerFuenteCell() {
+    private Callback<TableColumn<AuditoriaDAO.AuditoriaDTO, String>, TableCell<AuditoriaDAO.AuditoriaDTO, String>> makeVerFuenteCell() {
         return col -> new TableCell<>() {
             private final Button btn = new Button("Ver Fuente");
             {
                 btn.getStyleClass().add("ghostBtn");
                 btn.setOnAction(e -> {
-                    AuditoriaDTO dto = getTableView().getItems().get(getIndex());
+                    AuditoriaDAO.AuditoriaDTO dto = getTableView().getItems().get(getIndex());
                     onVerFuente(dto);
                 });
             }
@@ -203,18 +210,8 @@ public class AuditoriaController {
         };
     }
 
-    private void onVerFuente(AuditoriaDTO dto) {
+    private void onVerFuente(AuditoriaDAO.AuditoriaDTO dto) {
         // Placeholder: en real, abrir modal con detalle o navegar a la entidad
         System.out.println("Ver fuente → " + dto.referencia());
     }
-
-    /* ====== DTO ====== */
-    public record AuditoriaDTO(
-            String usuario,
-            String fechaHora,
-            String accion,
-            String modulo,
-            String detalle,
-            String referencia
-    ) { }
 }

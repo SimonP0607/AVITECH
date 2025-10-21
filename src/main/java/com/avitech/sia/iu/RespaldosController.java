@@ -1,6 +1,7 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.db.RespaldosDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,10 +34,10 @@ public class RespaldosController {
     @FXML private Label kpiTotal, kpiOk, kpiErr, kpiSpace;
 
     // tabla
-    @FXML private TableView<BackupItem> tblBackups;
-    @FXML private TableColumn<BackupItem, String> colArchivo, colFecha, colTipo, colTam, colEstado, colAcciones;
+    @FXML private TableView<RespaldosDAO.RespaldoDTO> tblBackups;
+    @FXML private TableColumn<RespaldosDAO.RespaldoDTO, String> colArchivo, colFecha, colTipo, colTam, colEstado, colAcciones;
 
-    private final ObservableList<BackupItem> master = FXCollections.observableArrayList();
+    private final ObservableList<RespaldosDAO.RespaldoDTO> master = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -61,7 +62,7 @@ public class RespaldosController {
                 btnRest.setOnAction(e -> onRestaurar(getItemAtRow()));
                 btnDel.setOnAction(e -> onBorrar(getItemAtRow()));
             }
-            private BackupItem getItemAtRow() { return getIndex() >= 0 && getIndex() < tblBackups.getItems().size()
+            private RespaldosDAO.RespaldoDTO getItemAtRow() { return getIndex() >= 0 && getIndex() < tblBackups.getItems().size()
                     ? tblBackups.getItems().get(getIndex()) : null; }
             @Override protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
@@ -70,8 +71,12 @@ public class RespaldosController {
             }
         });
 
-        // datos de ejemplo
-        seed();
+        try {
+            master.setAll(RespaldosDAO.getAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los respaldos: " + e.getMessage()).showAndWait();
+        }
 
         tblBackups.setItems(master);
         refreshKpis();
@@ -93,10 +98,10 @@ public class RespaldosController {
     /* ==================== Acciones Generales ==================== */
     @FXML private void onNuevoRespaldo() {
         // dummy: agrega un registro “en progreso/completado”
-        var now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm"));
-        master.add(0, new BackupItem("avitech_manual_" + System.currentTimeMillis() + ".bak",
-                now, "Manual", "2.0 GB", "Completado"));
-        tblBackups.refresh();
+        // En una app real, esto iniciaría un proceso en segundo plano y luego actualizaría la UI.
+        new Alert(Alert.AlertType.INFORMATION, "Iniciando nuevo respaldo manual (placeholder)...").showAndWait();
+        // onActualizar(); // Se llamaría al finalizar el proceso
+
         refreshKpis();
         refreshBanner();
     }
@@ -113,23 +118,18 @@ public class RespaldosController {
     }
 
     /* ==================== Acciones por fila ==================== */
-    private void onDescargar(BackupItem it) { if (it != null) info("Descargando: " + it.archivo()); }
-    private void onRestaurar(BackupItem it) { if (it != null) info("Restaurando: " + it.archivo()); }
-    private void onBorrar(BackupItem it) {
+    private void onDescargar(RespaldosDAO.RespaldoDTO it) { if (it != null) info("Descargando: " + it.archivo()); }
+    private void onRestaurar(RespaldosDAO.RespaldoDTO it) { if (it != null) info("Restaurando: " + it.archivo()); }
+    private void onBorrar(RespaldosDAO.RespaldoDTO it) {
         if (it == null) return;
-        master.remove(it);
-        refreshKpis();
-    }
-
-    /* ==================== Helpers ==================== */
-    private void seed() {
-        master.setAll(
-                new BackupItem("avitech_auto_20241007_020000.bak", "07/10/2024, 02:00", "Automático", "2.4 GB", "Completado"),
-                new BackupItem("avitech_auto_20241006_020000.bak", "06/10/2024, 02:00", "Automático", "2.3 GB", "Completado"),
-                new BackupItem("avitech_manual_actualizacion_20241005.bak", "05/10/2024, 14:30", "Manual", "2.2 GB", "Completado"),
-                new BackupItem("avitech_auto_20241003_020000.bak", "03/10/2024, 02:00", "Automático", "2.0 GB", "Error"),
-                new BackupItem("avitech_auto_20241002_020000.bak", "02/10/2024, 02:00", "Automático", "2.1 GB", "Completado")
-        );
+        try {
+            RespaldosDAO.deleteById(it.id());
+            master.remove(it);
+            refreshKpis();
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudo borrar el respaldo: " + e.getMessage()).showAndWait();
+        }
     }
 
     private void refreshKpis() {
@@ -163,7 +163,4 @@ public class RespaldosController {
         // en real: usar diálogo propio
         System.out.println(msg);
     }
-
-    /* DTO record para mayor claridad */
-    public record BackupItem(String archivo, String fecha, String tipo, String tamano, String estado) {}
 }

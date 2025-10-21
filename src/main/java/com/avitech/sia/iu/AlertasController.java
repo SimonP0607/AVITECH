@@ -1,6 +1,7 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App; // usa el mismo helper de navegación que ya tienes
+import com.avitech.sia.db.AlertasDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,6 +11,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Controller base para la vista de Alertas.
@@ -36,23 +38,23 @@ public class AlertasController {
     @FXML private ComboBox<String> cbUbicacion;
 
     /* ====== Tabla ====== */
-    @FXML private TableView<ItemAlerta> tblAlertas;
-    @FXML private TableColumn<ItemAlerta, String> colArticulo;
-    @FXML private TableColumn<ItemAlerta, String> colCategoria;
-    @FXML private TableColumn<ItemAlerta, String> colStockActual;
-    @FXML private TableColumn<ItemAlerta, String> colStockMin;
-    @FXML private TableColumn<ItemAlerta, String> colPorcentaje;
-    @FXML private TableColumn<ItemAlerta, String> colDias;
-    @FXML private TableColumn<ItemAlerta, String> colUbicacion;
-    @FXML private TableColumn<ItemAlerta, String> colAccion;
+    @FXML private TableView<AlertasDAO.ItemAlerta> tblAlertas;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colArticulo;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colCategoria;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colStockActual;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colStockMin;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colPorcentaje;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colDias;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colUbicacion;
+    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colAccion;
 
     @FXML private Label lblCantidadTabla;
     @FXML private Label lblActualizado;
     @FXML private Label lblResCritico, lblResBajo, lblResAdvertencia;
     @FXML private Label lblBanner;
 
-    private final ObservableList<ItemAlerta> master = FXCollections.observableArrayList();
-    private final ObservableList<ItemAlerta> filtered = FXCollections.observableArrayList();
+    private final ObservableList<AlertasDAO.ItemAlerta> master = FXCollections.observableArrayList();
+    private final ObservableList<AlertasDAO.ItemAlerta> filtered = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -71,16 +73,16 @@ public class AlertasController {
         // Tabla
         colArticulo.setCellValueFactory(new PropertyValueFactory<>("articulo"));
         colCategoria.setCellValueFactory(new PropertyValueFactory<>("categoria"));
-        colStockActual.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
-        colStockMin.setCellValueFactory(new PropertyValueFactory<>("stockMinimo"));
-        colPorcentaje.setCellValueFactory(new PropertyValueFactory<>("porcentaje"));
-        colDias.setCellValueFactory(new PropertyValueFactory<>("diasRestantes"));
-        colUbicacion.setCellValueFactory(new PropertyValueFactory<>("ubicacion"));
+        colStockActual.setCellValueFactory(new PropertyValueFactory<>("stockActual")); // Muestra "N/A"
+        colStockMin.setCellValueFactory(new PropertyValueFactory<>("stockMinimo")); // Muestra "N/A"
+        colPorcentaje.setCellValueFactory(new PropertyValueFactory<>("porcentaje")); // Muestra "N/A"
+        colDias.setCellValueFactory(new PropertyValueFactory<>("diasRestantes")); // Muestra "N/A"
+        colUbicacion.setCellValueFactory(new PropertyValueFactory<>("ubicacion")); // Muestra "N/A"
 
         // Columna de acción con botón "Ir al ítem"
         colAccion.setCellValueFactory(param -> new SimpleStringProperty("Ir al ítem"));
         colAccion.setCellFactory(col -> new TableCell<>() {
-            private final Hyperlink link = new Hyperlink("Ir al ítem");
+            private final Hyperlink link = new Hyperlink("Resolver");
             { link.setOnAction(e -> onGoItem(getTableView().getItems().get(getIndex()))); }
             @Override protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
@@ -89,8 +91,13 @@ public class AlertasController {
             }
         });
 
-        // Datos de ejemplo (hasta conectar BD)
-        seedSample();
+        // Cargar datos desde la BD
+        try {
+            master.setAll(AlertasDAO.getAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar las alertas: " + e.getMessage()).showAndWait();
+        }
 
         // Mostrar filtrado inicial
         applyFilter();
@@ -110,7 +117,7 @@ public class AlertasController {
     @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
     @FXML private void goAlerts()     { App.goTo("/fxml/alertas.fxml", "SIA Avitech — Alertas"); }
     @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
-    @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
+    @FXML private void goParams()     { App.goTo("/fxml/parametros_unidades.fxml", "SIA Avitech — Parámetros"); }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios.fxml", "SIA Avitech — Usuarios"); }
     @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
     @FXML private void onExit() {      App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");}
@@ -143,25 +150,12 @@ public class AlertasController {
         applyFilter();
     }
 
-    private void onGoItem(ItemAlerta item) {
+    private void onGoItem(AlertasDAO.ItemAlerta item) {
         // En real: navegación al detalle del artículo en Suministros con el ID.
-        goSupplies();
+        new Alert(Alert.AlertType.INFORMATION, "Resolviendo alerta (placeholder): " + item.getDescripcion()).showAndWait();
     }
 
     /* ================== Lógica local (dummy) ================== */
-
-    private void seedSample() {
-        master.setAll(
-                new ItemAlerta("Alimento Balanceado Postura", "Alimentos", "450 kg", "1000 kg", "45%", "2 días", "Almacén Principal", "Crítico"),
-                new ItemAlerta("Enrofloxacina 10%", "Medicamentos", "20 frascos", "40 frascos", "50%", "15 días", "Farmacia", "Bajo"),
-                new ItemAlerta("Vitaminas AD3E", "Vitaminas", "12 frascos", "25 frascos", "48%", "8 días", "Farmacia", "Bajo"),
-                new ItemAlerta("Alimento Pre-inicio", "Alimentos", "75 kg", "200 kg", "38%", "4 días", "Almacén Secundario", "Crítico"),
-                new ItemAlerta("Desinfectante Clorado", "Limpieza", "30 litros", "50 litros", "60%", "12 días", "Almacén de Químicos", "Advertencia"),
-                new ItemAlerta("Vacuna Newcastle", "Vacunas", "100 dosis", "450 dosis", "22%", "6 días", "Refrigerador Farmacia", "Crítico"),
-                new ItemAlerta("Vitro para Carne", "Molinos", "20 sacos", "80 sacos", "25%", "3 días", "Patio de Materiales", "Crítico"),
-                new ItemAlerta("Probióticos", "Suplementos", "6 envases", "15 envases", "40%", "10 días", "Farmacia", "Bajo")
-        );
-    }
 
     private void applyFilter() {
         String text = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
@@ -170,10 +164,10 @@ public class AlertasController {
         String ubi  = sel(cbUbicacion);
 
         filtered.setAll(master.filtered(it ->
-                (text.isEmpty() || it.articulo.toLowerCase().contains(text) || it.categoria.toLowerCase().contains(text) || it.ubicacion.toLowerCase().contains(text)) &&
-                        (cat.equals("Todas") || it.categoria.equalsIgnoreCase(cat)) &&
-                        (cri.equals("Todas") || it.nivel.equalsIgnoreCase(cri)) &&
-                        (ubi.equals("Todas") || it.ubicacion.equalsIgnoreCase(ubi))
+                (text.isEmpty() || it.getDescripcion().toLowerCase().contains(text) || it.getCategoria().toLowerCase().contains(text)) &&
+                        (cat.equals("Todas") || it.getCategoria().equalsIgnoreCase(cat)) &&
+                        (cri.equals("Todas") || it.getTipo().equalsIgnoreCase(cri)) &&
+                        (ubi.equals("Todas") /*|| it.getUbicacion().equalsIgnoreCase(ubi)*/) // Ubicación no está en la tabla Alertas
         ));
 
         tblAlertas.setItems(filtered);
@@ -186,9 +180,9 @@ public class AlertasController {
     }
 
     private void refreshKpis() {
-        long crit = master.stream().filter(i -> i.nivel.equalsIgnoreCase("Crítico")).count();
-        long bajo = master.stream().filter(i -> i.nivel.equalsIgnoreCase("Bajo")).count();
-        long adv  = master.stream().filter(i -> i.nivel.equalsIgnoreCase("Advertencia")).count();
+        long crit = master.stream().filter(i -> i.getTipo().equalsIgnoreCase("Crítico")).count();
+        long bajo = master.stream().filter(i -> i.getTipo().equalsIgnoreCase("Bajo")).count();
+        long adv  = master.stream().filter(i -> i.getTipo().equalsIgnoreCase("Advertencia")).count();
 
         kpiCritico.setText(String.valueOf(crit));
         kpiBajo.setText(String.valueOf(bajo));
@@ -200,24 +194,5 @@ public class AlertasController {
         lblResAdvertencia.setText("Advertencia — " + adv + " artículos");
 
         lblBanner.setText(crit + " artículo(s) en stock crítico requieren atención inmediata");
-    }
-
-    /* ================== DTO sencillo para la tabla ================== */
-    public static class ItemAlerta {
-        public final String articulo, categoria, stockActual, stockMinimo, porcentaje, diasRestantes, ubicacion, nivel;
-        public ItemAlerta(String articulo, String categoria, String stockActual, String stockMinimo,
-                          String porcentaje, String diasRestantes, String ubicacion, String nivel) {
-            this.articulo = articulo; this.categoria = categoria; this.stockActual = stockActual;
-            this.stockMinimo = stockMinimo; this.porcentaje = porcentaje; this.diasRestantes = diasRestantes;
-            this.ubicacion = ubicacion; this.nivel = nivel;
-        }
-        public String getArticulo() { return articulo; }
-        public String getCategoria() { return categoria; }
-        public String getStockActual() { return stockActual; }
-        public String getStockMinimo() { return stockMinimo; }
-        public String getPorcentaje() { return porcentaje; }
-        public String getDiasRestantes() { return diasRestantes; }
-        public String getUbicacion() { return ubicacion; }
-        public String getNivel() { return nivel; }
     }
 }
