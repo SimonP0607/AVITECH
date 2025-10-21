@@ -1,5 +1,6 @@
 package com.avitech.sia;
 
+import com.avitech.sia.iu.ScreenManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,13 +10,21 @@ import java.io.IOException;
 
 public class App extends Application {
     private static Stage primaryStage;
+    private static ScreenManager screenManager;
 
     public static Stage PrimaryStage() {
         return primaryStage;
     }
 
+    public static ScreenManager getScreenManager() {
+        return screenManager;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
+        // Inicializar el gestor de pantalla
+        screenManager = ScreenManager.getInstance();
+
         // Cargar fuentes (asegúrate de tenerlas en resources/fonts/)
         Font.loadFont(getClass().getResourceAsStream("/fonts/Poppins-Regular.ttf"), 12);
         Font.loadFont(getClass().getResourceAsStream("/fonts/Poppins-SemiBold.ttf"), 12);
@@ -29,7 +38,10 @@ public class App extends Application {
         scene.getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
 
         stage.setTitle("SIA Avitech — Inicio de sesión");
-        stage.setMaximized(true);
+
+        // Configurar el tamaño de la ventana según la pantalla detectada
+        screenManager.configureStage(stage, true); // true = maximizada
+
         stage.setScene(scene);
         stage.show();
     }
@@ -52,14 +64,17 @@ public class App extends Application {
 
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
+
+            // Mantener el estado de maximización o tamaño previo
             if (wasMaximized) {
-                primaryStage.setMaximized(true);
+                screenManager.configureStage(primaryStage, true);
             } else {
-                if (!Double.isNaN(width) && width > 0) {
+                if (!Double.isNaN(width) && width > 0 && !Double.isNaN(height) && height > 0) {
                     primaryStage.setWidth(width);
-                }
-                if (!Double.isNaN(height) && height > 0) {
                     primaryStage.setHeight(height);
+                } else {
+                    // Si no hay dimensiones válidas, usar el ScreenManager
+                    screenManager.configureStage(primaryStage, false);
                 }
             }
             primaryStage.show();

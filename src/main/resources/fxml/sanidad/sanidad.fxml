@@ -5,8 +5,7 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:id="root"
-            fx:controller="com.avitech.sia.iu.sanidad.SanidadController"
-            prefWidth="1920" prefHeight="1080">
+            fx:controller="com.avitech.sia.iu.sanidad.SanidadController">
 
     <!-- SIDEBAR -->
     <left>

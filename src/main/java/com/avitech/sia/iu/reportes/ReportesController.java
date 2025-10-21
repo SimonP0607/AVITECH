@@ -1,11 +1,12 @@
 package com.avitech.sia.iu.reportes;
 
 import com.avitech.sia.App;
+import com.avitech.sia.iu.BaseController;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-public class ReportesController {
+public class ReportesController extends BaseController {
 
     // Sidebar / topbar
     @FXML private VBox sidebar;
@@ -69,8 +70,11 @@ public class ReportesController {
     @FXML private void selMortalidad()            { /* setear tipo = MORT */ }
 
     @FXML
-    private void initialize() {
-        // Tip utilitario: marca “Reportes” como activo en el sidebar si aplica una clase CSS
+    public void initialize() {
+        // Llamar al initialize del padre (BaseController)
+        super.initialize();
+
+        // Tip utilitario: marca "Reportes" como activo en el sidebar si aplica una clase CSS
         lblHeader.setText("Administrador");
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
 
@@ -79,6 +83,8 @@ public class ReportesController {
         cbArticulo.getItems().addAll("Todos los artículos", "Maíz", "Trigo", "Alimento A");
         cbCategoria.getItems().addAll("Todas las categorías", "Insumos", "Alimento", "Vacunas");
         cbResponsable.getItems().addAll("Todos los responsables", "Juan", "Carla", "Admin");
+
+        // Seleccionar primeros items por defecto
         cbLote.getSelectionModel().selectFirst();
         cbArticulo.getSelectionModel().selectFirst();
         cbCategoria.getSelectionModel().selectFirst();
@@ -92,5 +98,25 @@ public class ReportesController {
         pbInv.setProgress(0.45);
         pbProd.setProgress(0.30);
         pbSan.setProgress(0.25);
+    }
+
+    @Override
+    protected void onScreenReady() {
+        // Este método se llama cuando el ScreenManager está disponible
+
+        // Ajustar anchos de columnas según la resolución de pantalla
+        adjustColumnWidth(colRepNombre, 360);   // Base: 360px
+        adjustColumnWidth(colRepFecha, 140);    // Base: 140px
+        adjustColumnWidth(colRepTam, 120);      // Base: 120px
+        adjustColumnWidth(colRepAccion, 160);   // Base: 160px
+
+        // Mostrar información de la pantalla en la consola (útil para debugging)
+        System.out.println("📱 Módulo Reportes ejecutándose en: " + getScreenInfo());
+
+        // Si la pantalla es pequeña, podríamos simplificar la UI
+        if (shouldUseSimplifiedUI()) {
+            System.out.println("⚠️ Pantalla pequeña detectada - UI simplificada activada");
+            // Aquí podrías ocultar columnas secundarias o reducir padding
+        }
     }
 }

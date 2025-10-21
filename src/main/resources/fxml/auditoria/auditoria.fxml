@@ -5,8 +5,7 @@
 <?import javafx.scene.control.cell.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.avitech.sia.iu.AuditoriaController"
-            prefWidth="1920" prefHeight="1080">
+            fx:controller="com.avitech.sia.iu.AuditoriaController">
 
     <!-- ====== SIDEBAR (mismo patrón que las otras pantallas) ====== -->
     <left>
