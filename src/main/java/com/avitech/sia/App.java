@@ -5,9 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class App extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
     private static Stage primaryStage;
 
     public static Stage PrimaryStage() {
@@ -16,6 +19,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        logger.info("Iniciando aplicación SIA Avitech");
+
         // Cargar fuentes (asegúrate de tenerlas en resources/fonts/)
         Font.loadFont(getClass().getResourceAsStream("/fonts/Poppins-Regular.ttf"), 12);
         Font.loadFont(getClass().getResourceAsStream("/fonts/Poppins-SemiBold.ttf"), 12);
@@ -32,6 +37,8 @@ public class App extends Application {
         stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
+
+        logger.info("Aplicación iniciada correctamente");
     }
 
     /**
@@ -63,8 +70,9 @@ public class App extends Application {
                 }
             }
             primaryStage.show();
+            logger.info("Navegando a: {}", fxmlPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al cambiar de escena: {}", fxmlPath, e);
             throw new RuntimeException("Error al cambiar de escena: " + fxmlPath, e);
         }
     }

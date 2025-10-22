@@ -8,8 +8,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoginController {
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     // --- Campos FXML ---
     @FXML private TextField txtUser;
@@ -25,6 +28,8 @@ public class LoginController {
     // --- Inicialización ---
     @FXML
     private void initialize() {
+        logger.info("Inicializando controlador de login");
+
         // Sincroniza el texto entre los dos campos
         txtPassPlain.textProperty().bindBidirectional(txtPass.textProperty());
 
@@ -82,12 +87,14 @@ public class LoginController {
         }
 
         try {
+            logger.info("Intentando login para usuario: {}", user);
             var optUsuario = UsuarioDAO.findByUsuario(user);
 
             if (optUsuario.isPresent()) {
                 UsuarioDAO.Usuario u = optUsuario.get();
                 // Usamos BCrypt para verificar el hash de la contraseña
                 if (PasswordUtil.check(pass, u.passHash())) {
+                    logger.info("Login exitoso para usuario: {} con rol: {}", user, u.rol());
                     // TODO: Guardar usuario en sesión global
                     String rol = u.rol().toUpperCase();
                     switch (rol) {
@@ -101,13 +108,18 @@ public class LoginController {
                             App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — OPERADOR");
                             break;
                         default:
+                            logger.warn("Rol de usuario no reconocido: {}", u.rol());
                             showError("Rol de usuario no reconocido: " + u.rol());
                     }
                     return; // Salir del método si el login es exitoso
+                } else {
+                    logger.warn("Contraseña incorrecta para usuario: {}", user);
                 }
+            } else {
+                logger.warn("Usuario no encontrado: {}", user);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Error al conectar con la base de datos durante login", ex);
             showError("Error al conectar con la base de datos.");
         }
 
