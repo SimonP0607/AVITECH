@@ -1,33 +1,41 @@
 package com.avitech.sia.iu.suministros;
 
 import com.avitech.sia.App;
+import com.avitech.sia.iu.BaseController;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.*;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
-import javafx.geometry.Insets; // ✅ este faltaba
+import javafx.geometry.Insets;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 
 /** Controlador Suministros: navegación, filtros/tabla con DataSource y modales con inyección de DS. */
-public class SuministrosController implements UsesSuministrosDataSource {
+public class SuministrosController extends BaseController implements UsesSuministrosDataSource {
+
+    @Override
+    protected Module getRequiredModule() {
+        return Module.SUMINISTROS;
+    }
 
     /* topbar / sidebar */
     @FXML private Label lblSystemStatus;
     @FXML private Label lblHeader;
     @FXML private Label lblUserInfo;
+    @FXML private VBox sidebar;
+    @FXML private ToggleGroup sideGroup;
 
     /* host para modales */
     @FXML private StackPane overlayHost;
@@ -59,9 +67,14 @@ public class SuministrosController implements UsesSuministrosDataSource {
     }
 
     @FXML
-    private void initialize() {
+    @Override
+    public void initialize() {
+        super.initialize();
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
         lblHeader.setText("Administrador");
+        // Configurar permisos del menú según el rol del usuario
+        configureMenuPermissions();
+
         lblUserInfo.setText("Administrador");
 
         /* columnas */
@@ -143,6 +156,45 @@ public class SuministrosController implements UsesSuministrosDataSource {
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml", "SIA Avitech — Usuarios"); }
     @FXML private void goBackup()     { /* pendiente */ }
     @FXML private void onExit()       { App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión"); }
+
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    private void configureMenuPermissions() {
+        if (sidebar == null || sessionManager == null) return;
+
+        // Recorrer todos los ToggleButton del sidebar
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButtonText(button.getText());
+                if (module != null) {
+                    boolean hasAccess = sessionManager.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    /**
+     * Obtiene el módulo asociado al texto de un botón del menú.
+     */
+    private Module getModuleFromButtonText(String text) {
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
+    }
 
     /* ========= Acciones (modales) ========= */
     @FXML private void onEntrada()   { showModal("/fxml/suministros/entrada.fxml"); }

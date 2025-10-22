@@ -16,7 +16,7 @@ public class CategoriasController {
     private final ObservableList<Row> master = FXCollections.observableArrayList();
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         cbEstado.setItems(FXCollections.observableArrayList("Todos los estados","Activo","Inactivo"));
         cbEstado.getSelectionModel().selectFirst();
 

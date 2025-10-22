@@ -21,7 +21,9 @@ public class MoverStockController implements UsesSuministrosDataSource {
     @Override public void setDataSource(SuministrosDataSource ds) { this.dataSource = (ds!=null?ds:new EmptySuministrosDataSource()); loadCombos(); }
 
     @FXML
-    private void initialize() { loadCombos(); }
+    public void initialize() {
+        loadCombos();
+    }
 
     private void loadCombos() {
         if (cbProducto == null) return;

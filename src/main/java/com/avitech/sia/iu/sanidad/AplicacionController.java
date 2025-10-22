@@ -44,7 +44,7 @@ public class AplicacionController {
     public void setResponsables(Collection<String> items) { responsables.setAll(nullSafe(items)); }
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         // Enlazar combos a las listas (que el caller llenará)
         cbLoteGalpon.setItems(lotes);
         cbMedicamento.setItems(medicamentos);

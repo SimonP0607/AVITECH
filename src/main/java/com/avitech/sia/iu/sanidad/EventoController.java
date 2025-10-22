@@ -45,7 +45,7 @@ public class EventoController {
 
     // ====== Ciclo de vida ======
     @FXML
-    private void initialize() {
+    public void initialize() {
         // Defaults/placeholder (se reemplazan al inyectar catálogos desde SanidadController)
         dpFecha.setValue(LocalDate.now());
         cbLoteGalpon.setItems(FXCollections.observableArrayList("Galpón 1", "Galpón 2", "Galpón 3"));

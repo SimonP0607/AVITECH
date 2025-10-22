@@ -1,23 +1,39 @@
 package com.avitech.sia.iu.parametros;
 
 import com.avitech.sia.App;
+import com.avitech.sia.iu.BaseController;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
-public class ParametrosController {
+public class ParametrosController extends BaseController {
+
+    @Override
+    protected Module getRequiredModule() {
+        return Module.PARAMETROS;
+    }
 
     @FXML private Label lblSystemStatus, lblHeader, lblUserInfo;
+    @FXML private VBox sidebar;
+    @FXML private ToggleGroup sideGroup;
     @FXML private ToggleButton btnUnidades, btnCategorias, btnMedicamentos, btnLotes, btnUbicaciones;
     @FXML private StackPane contentStack;
 
     @FXML
-    private void initialize() {
+    @Override
+    public void initialize() {
+        super.initialize();
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
         lblHeader.setText("Administrador");
+        // Configurar permisos del menú según el rol del usuario
+        configureMenuPermissions();
+
         lblUserInfo.setText("Administrador");
 
         // vista por defecto
@@ -50,6 +66,41 @@ public class ParametrosController {
     @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml",       "SIA Avitech — Auditoría"); }
     @FXML private void goParams()     { /* ya estás aquí */ }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml",        "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml",       "SIA Avitech — Respaldos"); }
+    @FXML private void goBackup()     { App.goTo("/fxml/respaldos/respaldos.fxml",       "SIA Avitech — Respaldos"); }
     @FXML private void onExit()       { App.goTo("/fxml/login.fxml",           "SIA Avitech — Inicio de sesión"); }
+
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    private void configureMenuPermissions() {
+        if (sidebar == null || sessionManager == null) return;
+
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButtonText(button.getText());
+                if (module != null) {
+                    boolean hasAccess = sessionManager.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    private Module getModuleFromButtonText(String text) {
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
+    }
 }

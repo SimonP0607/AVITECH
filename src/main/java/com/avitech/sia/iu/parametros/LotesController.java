@@ -16,7 +16,7 @@ public class LotesController {
     private final ObservableList<Row> master = FXCollections.observableArrayList();
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         cbEstado.setItems(FXCollections.observableArrayList("Todos los estados","Activo","Terminado"));
         cbEstado.getSelectionModel().selectFirst();
 

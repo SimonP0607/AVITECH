@@ -2,17 +2,24 @@ package com.avitech.sia.iu.reportes;
 
 import com.avitech.sia.App;
 import com.avitech.sia.iu.BaseController;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 public class ReportesController extends BaseController {
 
+    @Override
+    protected Module getRequiredModule() {
+        return Module.REPORTES;
+    }
+
     // Sidebar / topbar
     @FXML private VBox sidebar;
     @FXML private Label lblUserInfo;
     @FXML private Label lblSystemStatus;
     @FXML private Label lblHeader;
+    @FXML private ToggleGroup sideGroup;
 
     // Filtros
     @FXML private DatePicker dpDesde, dpHasta;
@@ -42,9 +49,44 @@ public class ReportesController extends BaseController {
     @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
     @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml", "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
+    @FXML private void goBackup()     { App.goTo("/fxml/respaldos/respaldos.fxml", "SIA Avitech — Respaldos"); }
     @FXML private void onExit() {
         App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");
+    }
+
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    private void configureMenuPermissions() {
+        if (sidebar == null || sessionManager == null) return;
+
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButtonText(button.getText());
+                if (module != null) {
+                    boolean hasAccess = sessionManager.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    private Module getModuleFromButtonText(String text) {
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
     }
 
 
@@ -73,6 +115,9 @@ public class ReportesController extends BaseController {
     public void initialize() {
         // Llamar al initialize del padre (BaseController)
         super.initialize();
+
+        // Configurar permisos del menú según el rol del usuario
+        configureMenuPermissions();
 
         // Tip utilitario: marca "Reportes" como activo en el sidebar si aplica una clase CSS
         lblHeader.setText("Administrador");

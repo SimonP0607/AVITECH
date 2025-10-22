@@ -37,7 +37,7 @@ public class StockController implements UsesSuministrosDataSource {
     @Override public void setDataSource(SuministrosDataSource ds) { this.dataSource = (ds!=null?ds:new EmptySuministrosDataSource()); loadCatalogsAndData(); }
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         colCodigo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().codigo()));
         colNombre.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().nombre()));
         colCat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().categoria()));

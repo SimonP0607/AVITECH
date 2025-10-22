@@ -28,7 +28,7 @@ public class NuevoUsuarioController {
     private Runnable onSave;
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         if (cbEstado.getItems().isEmpty()) {
             cbEstado.getItems().addAll("Activo", "Inactivo");
             cbEstado.getSelectionModel().selectFirst();

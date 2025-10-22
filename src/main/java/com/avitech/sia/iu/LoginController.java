@@ -1,6 +1,8 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.security.SessionManager;
+import com.avitech.sia.security.UserRole;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -22,7 +24,7 @@ public class LoginController {
 
     // --- Inicialización ---
     @FXML
-    private void initialize() {
+    public void initialize() {
         // Sincroniza el texto entre los dos campos
         txtPassPlain.textProperty().bindBidirectional(txtPass.textProperty());
 
@@ -69,7 +71,7 @@ public class LoginController {
         }
     }
 
-    // === Redirección por rol ===
+    // === Redirección por rol con SessionManager ===
     private void login() {
         String user = txtUser.getText().trim();
         String pass = (txtPass.isVisible() ? txtPass.getText() : txtPassPlain.getText());
@@ -79,22 +81,27 @@ public class LoginController {
             return;
         }
 
-        // DEMO: credenciales por defecto (puedes reemplazar por consulta a BD)
+        SessionManager sessionManager = SessionManager.getInstance();
+
+        // DEMO: credenciales por defecto (reemplazar por consulta a BD)
         if (user.equals("admin") && pass.equals("admin123")) {
-            // Navega al dashboard de ADMIN
-            App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN");
+            // Establecer sesión como ADMIN
+            sessionManager.login("admin", "Administrador del Sistema", UserRole.ADMIN);
+            App.goTo(sessionManager.getDashboardPath(), sessionManager.getDashboardTitle());
             return;
         }
+
         if (user.equals("supervisor") && pass.equals("super123")) {
-            // Si ya tienes el FXML del supervisor, cámbialo aquí:
-            // App.goTo("/fxml/dashboard_supervisor.fxml", "SIA Avitech — SUPERVISOR");
-            App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — SUPERVISOR (demo)");
+            // Establecer sesión como SUPERVISOR
+            sessionManager.login("supervisor", "Supervisor de Operaciones", UserRole.SUPERVISOR);
+            App.goTo(sessionManager.getDashboardPath(), sessionManager.getDashboardTitle());
             return;
         }
+
         if (user.equals("operador") && pass.equals("oper123")) {
-            // Si ya tienes el FXML del operador, cámbialo aquí:
-            // App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — OPERADOR");
-            App.goTo("/fxml/dashboard_super.fxml", "SIA Avitech — OPERADOR (demo)");
+            // Establecer sesión como OPERADOR
+            sessionManager.login("operador", "Operador de Campo", UserRole.OPERADOR);
+            App.goTo(sessionManager.getDashboardPath(), sessionManager.getDashboardTitle());
             return;
         }
 

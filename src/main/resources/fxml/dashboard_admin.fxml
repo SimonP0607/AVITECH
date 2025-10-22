@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.avitech.sia.iu.dashboard.DashboardController">
+            fx:controller="com.avitech.sia.iu.dashboard.DashboardAdminController">
 
     <!-- ===== SIDEBAR (scroll propio) ===== -->
     <left>
@@ -205,10 +205,10 @@
                         <!-- Acciones rápidas -->
                         <HBox spacing="10">
                             <children>
-                                <Button text="Registrar Producción" styleClass="primary" prefWidth="220"/>
-                                <Button text="Gestionar Suministros" styleClass="primary" prefWidth="220"/>
-                                <Button text="Registro Sanitario" styleClass="primary" prefWidth="220"/>
-                                <Button text="Generar Reportes" styleClass="primary" prefWidth="220"/>
+                                <Button text="Registrar Producción" onAction="#goProduction" styleClass="primary" prefWidth="220"/>
+                                <Button text="Gestionar Suministros" onAction="#goSupplies" styleClass="primary" prefWidth="220"/>
+                                <Button text="Registro Sanitario" onAction="#goHealth" styleClass="primary" prefWidth="220"/>
+                                <Button text="Generar Reportes" onAction="#goReports" styleClass="primary" prefWidth="220"/>
                             </children>
                         </HBox>
                     </children>

@@ -1,7 +1,9 @@
 package com.avitech.sia.iu.usuarios;
 
 import com.avitech.sia.App;
+import com.avitech.sia.iu.BaseController;
 import com.avitech.sia.iu.ModalUtil;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,22 +13,29 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
  * Gestión de Usuarios — UI lista para conectarse a BD.
  * Diseñada para trabajar con un UsersDataSource (inyectable).
  */
-public class UsuariosController implements UsesUsersDataSource {
+public class UsuariosController extends BaseController implements UsesUsersDataSource {
+
+    @Override
+    protected Module getRequiredModule() {
+        return Module.USUARIOS;
+    }
 
     /* ======= Topbar / sidebar ======= */
     @FXML private Label lblSystemStatus, lblHeader, lblUserInfo;
+    @FXML private VBox sidebar;
+    @FXML private ToggleGroup sideGroup;
 
     /* ======= Filtros / CTA ======= */
     @FXML private TextField tfSearch;
@@ -63,10 +72,15 @@ public class UsuariosController implements UsesUsersDataSource {
     }
 
     @FXML
-    private void initialize() {
+    @Override
+    public void initialize() {
+        super.initialize();
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
         lblHeader.setText("Administrador");
         lblUserInfo.setText("Administrador");
+
+        // Configurar permisos del menú según el rol del usuario
+        configureMenuPermissions();
 
         colNombre.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().nombre()));
         colUsuario.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().usuario()));
@@ -230,8 +244,43 @@ public class UsuariosController implements UsesUsersDataSource {
     @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
     @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml", "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
+    @FXML private void goBackup()     { App.goTo("/fxml/respaldos/respaldos.fxml", "SIA Avitech — Respaldos"); }
     @FXML private void onExit()       { App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión"); }
+
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    private void configureMenuPermissions() {
+        if (sidebar == null || sessionManager == null) return;
+
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButtonText(button.getText());
+                if (module != null) {
+                    boolean hasAccess = sessionManager.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    private Module getModuleFromButtonText(String text) {
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
+    }
 
     public record UserRow(long id,
                           String nombre,

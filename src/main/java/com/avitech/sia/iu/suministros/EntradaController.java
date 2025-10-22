@@ -38,7 +38,7 @@ public class EntradaController implements UsesSuministrosDataSource {
     @Override public void setDataSource(SuministrosDataSource ds) { this.dataSource = (ds!=null?ds:new EmptySuministrosDataSource()); loadCombos(); }
 
     @FXML
-    private void initialize() {
+    public void initialize() {
         dpFecha.setValue(LocalDate.now());
 
         colProd.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().producto()));

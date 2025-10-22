@@ -1,6 +1,7 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,17 +9,25 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-public class RespaldosController {
+public class RespaldosController extends BaseController {
+
+    @Override
+    protected Module getRequiredModule() {
+        return Module.RESPALDOS;
+    }
 
     // topbar
     @FXML private Label lblSystemStatus;
     @FXML private Label lblHeader;
     @FXML private Label lblUserInfo;
+    @FXML private VBox sidebar;
+    @FXML private ToggleGroup sideGroup;
 
     // banner auto
     @FXML private Label lblAutoUltimo, lblAutoProximo, lblAutoTasa, lblAutoEstado;
@@ -33,7 +42,9 @@ public class RespaldosController {
     private final ObservableList<BackupItem> master = FXCollections.observableArrayList();
 
     @FXML
-    private void initialize() {
+    @Override
+    public void initialize() {
+        super.initialize();
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
         lblHeader.setText("Administrador");
         lblUserInfo.setText("Administrador");
@@ -84,7 +95,42 @@ public class RespaldosController {
     @FXML private void goParams()      { App.goTo("/fxml/parametros_unidades.fxml", "SIA Avitech — Parámetros"); }
     @FXML private void goUsers()       { App.goTo("/fxml/usuarios/usuarios.fxml",         "SIA Avitech — Usuarios"); }
 
-    /* ==================== Acciones Generales ==================== */
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    private void configureMenuPermissions() {
+        if (sidebar == null || sessionManager == null) return;
+
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButtonText(button.getText());
+                if (module != null) {
+                    boolean hasAccess = sessionManager.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    private Module getModuleFromButtonText(String text) {
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
+    }
+
+    /* ===================== Respaldo manual ===================== */
     @FXML private void onNuevoRespaldo() {
         // dummy: agrega un registro “en progreso/completado”
         var now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm"));

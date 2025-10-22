@@ -1,20 +1,30 @@
 package com.avitech.sia.iu.sanidad;
 
 import com.avitech.sia.App;
+import com.avitech.sia.iu.BaseController;
 import com.avitech.sia.iu.ModalUtil;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ProgressBarTableCell;
+import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 
 
 /** Control de Sanidad — preparado para BD (sin datos mock). */
-public class SanidadController implements UsesSanidadDataSource {
+public class SanidadController extends BaseController implements UsesSanidadDataSource {
+
+    @Override
+    protected Module getRequiredModule() {
+        return Module.SANIDAD;
+    }
 
     /* ======= Top / sidebar ======= */
     @FXML private Label lblSystemStatus, lblHeader, lblUserInfo;
+    @FXML private VBox sidebar;
+    @FXML private ToggleGroup sideGroup;
 
     /* ======= KPIs ======= */
     @FXML private Label kpiAplicaciones, kpiAplicacionesDelta, kpiMortalidad,
@@ -36,11 +46,16 @@ public class SanidadController implements UsesSanidadDataSource {
     @FXML private Button btnRegistrarAplicacion, btnRegistrarEvento;
 
     @FXML
-    private void initialize() {
+    @Override
+    public void initialize() {
+        super.initialize();
         /* Cabecera */
         lblHeader.setText("Administrador");
         lblUserInfo.setText("Administrador");
         lblSystemStatus.setText("Sistema Offline – MySQL Local");
+
+        // Configurar permisos del menú según el rol del usuario
+        configureMenuPermissions();
 
         /* KPIs vacíos (se llenarán desde BD) */
         kpiAplicaciones.setText("—");
@@ -167,8 +182,43 @@ public class SanidadController implements UsesSanidadDataSource {
     @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml",       "SIA Avitech — Auditoría"); }
     @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml",      "SIA Avitech — Parámetros"); }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml",        "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml",       "SIA Avitech — Respaldos"); }
+    @FXML private void goBackup()     { App.goTo("/fxml/respaldos/respaldos.fxml",       "SIA Avitech — Respaldos"); }
     @FXML private void onExit()       { App.goTo("/fxml/login.fxml",           "SIA Avitech — LOGIN"); }
+
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    private void configureMenuPermissions() {
+        if (sidebar == null || sessionManager == null) return;
+
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButtonText(button.getText());
+                if (module != null) {
+                    boolean hasAccess = sessionManager.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    private Module getModuleFromButtonText(String text) {
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
+    }
 
     /* ================= Modelos fila (TableView) ================= */
 

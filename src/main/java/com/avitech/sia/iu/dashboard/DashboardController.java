@@ -1,159 +1,288 @@
 package com.avitech.sia.iu.dashboard;
 
 import com.avitech.sia.App;
+import com.avitech.sia.iu.BaseController;
+import com.avitech.sia.security.UserRole;
+import com.avitech.sia.security.UserRole.Module;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Tablero Principal (sin datos quemados).
- * Carga la UI desde una fuente de datos inyectable (DashboardDataSource).
+ * Controlador base para todos los dashboards del sistema.
+ * Proporciona funcionalidad común de navegación y visualización de datos.
  */
-public class DashboardController {
+public abstract class DashboardController extends BaseController {
 
-    // Topbar / user
-    @FXML private Label lblHeader;
-    @FXML private Label lblSystemStatus;
-    @FXML private Label lblUserInfo;
+    // ===== Componentes del menú lateral =====
+    @FXML protected ScrollPane spMenu;
+    @FXML protected VBox sidebar;
+    @FXML protected ToggleGroup sideGroup;
+    @FXML protected Label lblUserInfo;
 
-    // KPIs
-    @FXML private Label lblAvesActivas;
-    @FXML private Label lblAvesActivasDelta;
-    @FXML private Label lblHuevosDia;
-    @FXML private Label lblHuevosDiaDelta;
-    @FXML private Label lblSuministros;
-    @FXML private Label lblSuministrosDelta;
-    @FXML private Label lblAlertas;
-    @FXML private Label lblAlertasDelta;
+    // ===== Componentes de la barra superior =====
+    @FXML protected Label lblSystemStatus;
+    @FXML protected Label lblHeader;
 
-    // Chart + alertas
-    @FXML private LineChart<String, Number> chartSemanal;
-    @FXML private ListView<String> listAlertas;
+    // ===== Componentes del contenido central =====
+    @FXML protected ScrollPane spContent;
+    @FXML protected VBox contentRoot;
 
-    // Galpones
-    @FXML private ProgressBar pbG1; @FXML private Label lblG1;
-    @FXML private ProgressBar pbG2; @FXML private Label lblG2;
-    @FXML private ProgressBar pbG3; @FXML private Label lblG3;
-    @FXML private ProgressBar pbG4; @FXML private Label lblG4;
-    @FXML private ProgressBar pbG5; @FXML private Label lblG5;
-    @FXML private ProgressBar pbG6; @FXML private Label lblG6;
+    // ===== KPIs =====
+    @FXML protected Label lblAvesActivas;
+    @FXML protected Label lblAvesActivasDelta;
+    @FXML protected Label lblHuevosDia;
+    @FXML protected Label lblHuevosDiaDelta;
+    @FXML protected Label lblAlertasActivas;
+    @FXML protected Label lblAlertasActivasDelta;
+    @FXML protected Label lblMortalidadSemana;
+    @FXML protected Label lblMortalidadSemanaDelta;
 
-    // Sidebar
-    @FXML private VBox sidebar;
+    protected UserRole currentUserRole;
+    protected DashboardDataSource dataSource;
 
-    // ====== Fuente de datos (inyectable) ======
-    private DashboardDataSource dataSource = new EmptyDashboardDataSource();
-    public void setDataSource(DashboardDataSource ds) {
-        this.dataSource = (ds != null) ? ds : new EmptyDashboardDataSource();
+    /**
+     * Establece el rol del usuario antes de inicializar.
+     */
+    protected void setUserRole(UserRole role) {
+        this.currentUserRole = role;
+    }
+
+    @Override
+    @FXML
+    public void initialize() {
+        super.initialize();
+
+        // Inicializar fuente de datos (puede ser real o mock)
+        dataSource = createDataSource();
+
+        // Configurar información del usuario
+        configureUserInfo();
+
+        // Configurar visibilidad de botones según permisos
+        configureMenuPermissions();
+
+        // Cargar datos del dashboard
+        loadDashboardData();
+    }
+
+    /**
+     * Crea la fuente de datos para el dashboard.
+     * Las subclases pueden sobrescribir este método para proporcionar datos reales.
+     */
+    protected DashboardDataSource createDataSource() {
+        return new EmptyDashboardDataSource();
+    }
+
+    /**
+     * Configura la información del usuario en el menú lateral.
+     */
+    protected void configureUserInfo() {
+        if (lblUserInfo != null && sessionManager != null) {
+            lblUserInfo.setText(sessionManager.getFullName());
+        }
+
+        if (lblHeader != null && sessionManager != null) {
+            String roleName = getRoleName(sessionManager.getUserRole());
+            lblHeader.setText(roleName);
+        }
+
+        if (lblSystemStatus != null) {
+            lblSystemStatus.setText("Sistema Offline – MySQL Local");
+        }
+    }
+
+    /**
+     * Obtiene el nombre legible del rol.
+     */
+    protected String getRoleName(UserRole role) {
+        return switch (role) {
+            case ADMIN -> "Administrador";
+            case SUPERVISOR -> "Supervisor";
+            case OPERADOR -> "Operador";
+        };
+    }
+
+    /**
+     * Configura la visibilidad de los botones del menú según los permisos del usuario.
+     */
+    protected void configureMenuPermissions() {
+        if (sidebar == null || currentUserRole == null) return;
+
+        // Recorrer todos los ToggleButton del sidebar
+        sidebar.getChildren().stream()
+            .filter(node -> node instanceof ToggleButton)
+            .map(node -> (ToggleButton) node)
+            .forEach(button -> {
+                Module module = getModuleFromButton(button);
+                if (module != null) {
+                    boolean hasAccess = currentUserRole.hasAccessTo(module);
+                    button.setVisible(hasAccess);
+                    button.setManaged(hasAccess);
+                }
+            });
+    }
+
+    /**
+     * Obtiene el módulo asociado a un botón del menú.
+     */
+    protected Module getModuleFromButton(ToggleButton button) {
+        String text = button.getText();
+        return switch (text) {
+            case "Tablero" -> Module.DASHBOARD;
+            case "Suministros" -> Module.SUMINISTROS;
+            case "Sanidad" -> Module.SANIDAD;
+            case "Producción" -> Module.PRODUCCION;
+            case "Reportes" -> Module.REPORTES;
+            case "Alertas" -> Module.ALERTAS;
+            case "Auditoría" -> Module.AUDITORIA;
+            case "Parámetros" -> Module.PARAMETROS;
+            case "Usuarios" -> Module.USUARIOS;
+            case "Respaldos" -> Module.RESPALDOS;
+            default -> null;
+        };
+    }
+
+    /**
+     * Carga los datos del dashboard desde la fuente de datos.
+     */
+    protected void loadDashboardData() {
+        if (dataSource == null) return;
+
+        Platform.runLater(() -> {
+            // Cargar KPIs
+            DashboardDataSource.Kpis kpis = dataSource.getKpis();
+
+            if (lblAvesActivas != null) {
+                lblAvesActivas.setText(kpis.avesActivas() != null ?
+                    String.format("%,d", kpis.avesActivas()) : "—");
+            }
+            if (lblAvesActivasDelta != null) {
+                lblAvesActivasDelta.setText(kpis.deltaAves() != null ?
+                    formatDelta(kpis.deltaAves()) : "—");
+            }
+
+            if (lblHuevosDia != null) {
+                lblHuevosDia.setText(kpis.huevosDia() != null ?
+                    String.format("%,d", kpis.huevosDia()) : "—");
+            }
+            if (lblHuevosDiaDelta != null) {
+                lblHuevosDiaDelta.setText(kpis.deltaHuevosDia() != null ?
+                    formatDelta(kpis.deltaHuevosDia()) : "—");
+            }
+
+            if (lblAlertasActivas != null) {
+                lblAlertasActivas.setText(kpis.alertas() != null ?
+                    String.valueOf(kpis.alertas()) : "—");
+            }
+            if (lblAlertasActivasDelta != null) {
+                lblAlertasActivasDelta.setText(kpis.deltaAlertas() != null ?
+                    formatDelta(kpis.deltaAlertas()) : "—");
+            }
+
+            if (lblMortalidadSemana != null) {
+                lblMortalidadSemana.setText(kpis.suministros() != null ?
+                    String.format("%,d", kpis.suministros()) : "—");
+            }
+            if (lblMortalidadSemanaDelta != null) {
+                lblMortalidadSemanaDelta.setText(kpis.deltaSuministros() != null ?
+                    formatDelta(kpis.deltaSuministros()) : "—");
+            }
+        });
+    }
+
+    /**
+     * Formatea un valor delta con signo.
+     */
+    protected String formatDelta(int delta) {
+        if (delta > 0) {
+            return "+" + delta;
+        }
+        return String.valueOf(delta);
+    }
+
+    // ===== Métodos de navegación =====
+
+    @FXML
+    protected void goDashboard() {
+        // Ya estamos en el dashboard
     }
 
     @FXML
-    private void initialize() {
-        if (lblSystemStatus != null) lblSystemStatus.setText("Sistema Offline — MySQL Local");
-        setHeader("Administrador");
-
-        // Placeholders seguros
-        setKpi(lblAvesActivas, lblAvesActivasDelta, null, null, false);
-        setKpi(lblHuevosDia,    lblHuevosDiaDelta,    null, null, true);
-        setKpi(lblSuministros,  lblSuministrosDelta,  null, null, false);
-        setKpi(lblAlertas,      lblAlertasDelta,      null, null, false);
-
-        chartSemanal.getData().clear();
-        listAlertas.setItems(FXCollections.observableArrayList());
-
-        setGalpon(pbG1, lblG1, 0, 0);
-        setGalpon(pbG2, lblG2, 0, 0);
-        setGalpon(pbG3, lblG3, 0, 0);
-        setGalpon(pbG4, lblG4, 0, 0);
-        setGalpon(pbG5, lblG5, 0, 0);
-        setGalpon(pbG6, lblG6, 0, 0);
-
-        Platform.runLater(this::refresh);
-    }
-
-    /** Recarga toda la pantalla desde la fuente de datos. */
-    public void refresh() {
-        // KPIs
-        DashboardDataSource.Kpis k = dataSource.getKpis();
-        setKpi(lblAvesActivas, lblAvesActivasDelta, k.avesActivas(), k.deltaAves(), false);
-        setKpi(lblHuevosDia,    lblHuevosDiaDelta,    k.huevosDia(),   k.deltaHuevosDia(), true);
-        setKpi(lblSuministros,  lblSuministrosDelta,  k.suministros(), k.deltaSuministros(), false);
-        setKpi(lblAlertas,      lblAlertasDelta,      k.alertas(),     k.deltaAlertas(), false);
-
-        // Gráfico semanal
-        XYChart.Series<String, Number> serie = new XYChart.Series<>();
-        chartSemanal.getData().clear();
-        for (DashboardDataSource.Point p : dataSource.getWeeklyProduction()) {
-            serie.getData().add(new XYChart.Data<>(p.label(), p.value()));
+    protected void goSupplies() {
+        if (hasAccessTo(Module.SUMINISTROS)) {
+            App.goTo("/fxml/suministros/suministros.fxml", "SIA Avitech — Suministros");
         }
-        chartSemanal.getData().add(serie);
+    }
 
-        // Alertas recientes
-        List<String> items = new ArrayList<>();
-        for (DashboardDataSource.Alert a : dataSource.getRecentAlerts()) {
-            items.add(a.when() + " · " + a.message());
+    @FXML
+    protected void goHealth() {
+        if (hasAccessTo(Module.SANIDAD)) {
+            App.goTo("/fxml/sanidad/sanidad.fxml", "SIA Avitech — Sanidad");
         }
-        listAlertas.setItems(FXCollections.observableArrayList(items));
-
-        // Galpones
-        setCoopFrom(1, pbG1, lblG1);
-        setCoopFrom(2, pbG2, lblG2);
-        setCoopFrom(3, pbG3, lblG3);
-        setCoopFrom(4, pbG4, lblG4);
-        setCoopFrom(5, pbG5, lblG5);
-        setCoopFrom(6, pbG6, lblG6);
     }
 
-    // ====== Navegación (stubs) ======
-    @FXML private void onExit()       { App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión"); }
-    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
-    @FXML private void goSupplies()   { App.goTo("/fxml/suministros/suministros.fxml", "SIA Avitech — Suministros"); }
-    @FXML private void goHealth()     { App.goTo("/fxml/sanidad/sanidad.fxml", "SIA Avitech — Sanidad"); }
-    @FXML private void goProduction() { App.goTo("/fxml/produccion/produccion.fxml", "SIA Avitech — Producción"); }
-    @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
-    @FXML private void goAlerts()     { App.goTo("/fxml/alertas/alertas.fxml", "SIA Avitech — Alertas"); }
-    @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
-    @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
-    @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml", "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
-
-    // ====== API pública ======
-    public void setHeader(String header) {
-        if (lblHeader != null) lblHeader.setText(header);
-        if (lblUserInfo != null) lblUserInfo.setText(header);
+    @FXML
+    protected void goProduction() {
+        if (hasAccessTo(Module.PRODUCCION)) {
+            App.goTo("/fxml/produccion/produccion.fxml", "SIA Avitech — Producción");
+        }
     }
 
-    // ====== Helpers ======
-    private void setKpi(Label value, Label delta, Integer v, Integer d, boolean deltaIsPercent) {
-        value.setText(v == null ? "—" : formatInt(v));
-        if (d == null) { delta.setText(""); delta.getStyleClass().remove("bad"); return; }
-        String sign = d > 0 ? "+" : "";
-        delta.setText(sign + d + (deltaIsPercent ? "%" : ""));
-        if (d < 0 && !delta.getStyleClass().contains("bad")) delta.getStyleClass().add("bad");
-        if (d >= 0) delta.getStyleClass().remove("bad");
+    @FXML
+    protected void goReports() {
+        if (hasAccessTo(Module.REPORTES)) {
+            App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes");
+        }
     }
 
-    private void setCoopFrom(int n, ProgressBar pb, Label lbl) {
-        DashboardDataSource.Coop c = dataSource.getCoopsProduction().stream()
-                .filter(x -> x.num() == n).findFirst()
-                .orElse(new DashboardDataSource.Coop(n, 0, 0));
-        setGalpon(pb, lbl, c.current(), c.target());
+    @FXML
+    protected void goAlerts() {
+        if (hasAccessTo(Module.ALERTAS)) {
+            App.goTo("/fxml/alertas/alertas.fxml", "SIA Avitech — Alertas");
+        }
     }
 
-    private void setGalpon(ProgressBar pb, Label lbl, int actual, int meta) {
-        double pct = meta == 0 ? 0 : Math.min(1.0, actual / (double) meta);
-        pb.setProgress(pct);
-        lbl.setText(actual + "/" + meta + " (" + Math.round(pct * 100) + "%)");
+    @FXML
+    protected void goAudit() {
+        if (hasAccessTo(Module.AUDITORIA)) {
+            App.goTo("/fxml/auditoria/auditoria.fxml", "SIA Avitech — Auditoría");
+        }
     }
 
-    private String formatInt(int v) {
-        return String.format("%,d", v).replace(',', '.'); // 12.450
+    @FXML
+    protected void goParams() {
+        if (hasAccessTo(Module.PARAMETROS)) {
+            App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros");
+        }
+    }
+
+    @FXML
+    protected void goUsers() {
+        if (hasAccessTo(Module.USUARIOS)) {
+            App.goTo("/fxml/usuarios/usuarios.fxml", "SIA Avitech — Usuarios");
+        }
+    }
+
+    @FXML
+    protected void goBackup() {
+        if (hasAccessTo(Module.RESPALDOS)) {
+            App.goTo("/fxml/respaldos/respaldos.fxml", "SIA Avitech — Respaldos");
+        }
+    }
+
+    @FXML
+    protected void onExit() {
+        logout();
+    }
+
+    @Override
+    protected Module getRequiredModule() {
+        return Module.DASHBOARD;
     }
 }
+
