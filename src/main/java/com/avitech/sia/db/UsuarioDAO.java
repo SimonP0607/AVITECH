@@ -7,7 +7,24 @@ import java.util.Optional;
 
 public class UsuarioDAO {
     // nombre completo, usuario (login), rol, estado (activo), hash
-    public record Usuario(int id, String usuario, String rol, String passHash) {}
+    public static class Usuario {
+        private int id;
+        private String usuario;
+        private String rol;
+        private String passHash;
+
+        public Usuario(int id, String usuario, String rol, String passHash) {
+            this.id = id;
+            this.usuario = usuario;
+            this.rol = rol;
+            this.passHash = passHash;
+        }
+
+        public int getId() { return id; }
+        public String getUsuario() { return usuario; }
+        public String getRol() { return rol; }
+        public String getPassHash() { return passHash; }
+    }
 
     public static Optional<Usuario> findByUsuario(String u) throws Exception {
         try (Connection cn = DB.get();

@@ -44,12 +44,32 @@ public class RespaldosDAO {
         }
     }
 
-    /* DTO record para mayor claridad */
-    public record RespaldoDTO(int id,
-                              String archivo,
-                              String fecha,
-                              String tipo,
-                              String tamano,
-                              String estado,
-                              String usuario) {}
+    /* DTO class para mayor claridad */
+    public static class RespaldoDTO {
+        private int id;
+        private String archivo;
+        private String fecha;
+        private String tipo;
+        private String tamano;
+        private String estado;
+        private String usuario;
+
+        public RespaldoDTO(int id, String archivo, String fecha, String tipo, String tamano, String estado, String usuario) {
+            this.id = id;
+            this.archivo = archivo;
+            this.fecha = fecha;
+            this.tipo = tipo;
+            this.tamano = tamano;
+            this.estado = estado;
+            this.usuario = usuario;
+        }
+
+        public int getId() { return id; }
+        public String getArchivo() { return archivo; }
+        public String getFecha() { return fecha; }
+        public String getTipo() { return tipo; }
+        public String getTamano() { return tamano; }
+        public String getEstado() { return estado; }
+        public String getUsuario() { return usuario; }
+    }
 }

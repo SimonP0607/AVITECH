@@ -46,11 +46,11 @@ public class RespaldosController {
         lblUserInfo.setText("Administrador");
 
         // columnas
-        colArchivo.setCellValueFactory(new PropertyValueFactory<>("archivo"));
-        colFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
-        colTam.setCellValueFactory(new PropertyValueFactory<>("tamano"));
-        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        colArchivo.setCellValueFactory(new PropertyValueFactory<>("getArchivo"));
+        colFecha.setCellValueFactory(new PropertyValueFactory<>("getFecha"));
+        colTipo.setCellValueFactory(new PropertyValueFactory<>("getTipo"));
+        colTam.setCellValueFactory(new PropertyValueFactory<>("getTamano"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("getEstado"));
         colAcciones.setCellValueFactory(param -> new SimpleStringProperty("acciones"));
         colAcciones.setCellFactory(c -> new TableCell<>() {
             private final Hyperlink btnDesc = new Hyperlink("Descargar");
@@ -118,12 +118,12 @@ public class RespaldosController {
     }
 
     /* ==================== Acciones por fila ==================== */
-    private void onDescargar(RespaldosDAO.RespaldoDTO it) { if (it != null) info("Descargando: " + it.archivo()); }
-    private void onRestaurar(RespaldosDAO.RespaldoDTO it) { if (it != null) info("Restaurando: " + it.archivo()); }
+    private void onDescargar(RespaldosDAO.RespaldoDTO it) { if (it != null) info("Descargando: " + it.getArchivo()); }
+    private void onRestaurar(RespaldosDAO.RespaldoDTO it) { if (it != null) info("Restaurando: " + it.getArchivo()); }
     private void onBorrar(RespaldosDAO.RespaldoDTO it) {
         if (it == null) return;
         try {
-            RespaldosDAO.deleteById(it.id());
+            RespaldosDAO.deleteById(it.getId());
             master.remove(it);
             refreshKpis();
         } catch (Exception e) {
@@ -134,9 +134,9 @@ public class RespaldosController {
 
     private void refreshKpis() {
         long total = master.size();
-        long ok    = master.stream().filter(b -> b.estado().equalsIgnoreCase("Completado")).count();
-        long err   = master.stream().filter(b -> b.estado().equalsIgnoreCase("Error")).count();
-        double spaceGb = master.stream().mapToDouble(b -> parseGb(b.tamano())).sum();
+        long ok    = master.stream().filter(b -> b.getEstado().equalsIgnoreCase("Completado")).count();
+        long err   = master.stream().filter(b -> b.getEstado().equalsIgnoreCase("Error")).count();
+        double spaceGb = master.stream().mapToDouble(b -> parseGb(b.getTamano())).sum();
 
         kpiTotal.setText(String.valueOf(total));
         kpiOk.setText(String.valueOf(ok));

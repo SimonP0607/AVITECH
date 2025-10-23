@@ -93,10 +93,10 @@ public class LoginController {
             if (optUsuario.isPresent()) {
                 UsuarioDAO.Usuario u = optUsuario.get();
                 // Usamos BCrypt para verificar el hash de la contraseña
-                if (PasswordUtil.check(pass, u.passHash())) {
-                    logger.info("Login exitoso para usuario: {} con rol: {}", user, u.rol());
+                if (PasswordUtil.check(pass, u.getPassHash())) {
+                    logger.info("Login exitoso para usuario: {} con rol: {}", user, u.getRol());
                     // TODO: Guardar usuario en sesión global
-                    String rol = u.rol().toUpperCase();
+                    String rol = u.getRol().toUpperCase();
                     switch (rol) {
                         case "ADMIN":
                             App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN");
@@ -108,8 +108,8 @@ public class LoginController {
                             App.goTo("/fxml/dashboard_oper.fxml", "SIA Avitech — OPERADOR");
                             break;
                         default:
-                            logger.warn("Rol de usuario no reconocido: {}", u.rol());
-                            showError("Rol de usuario no reconocido: " + u.rol());
+                            logger.warn("Rol de usuario no reconocido: {}", u.getRol());
+                            showError("Rol de usuario no reconocido: " + u.getRol());
                     }
                     return; // Salir del método si el login es exitoso
                 } else {

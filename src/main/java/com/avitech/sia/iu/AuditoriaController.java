@@ -80,11 +80,11 @@ public class AuditoriaController {
         cboAccion.getSelectionModel().selectFirst();
 
         // Tabla
-        colUsuario.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().usuario()));
-        colFecha.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().fechaHora()));
-        colAccion.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().accion()));
-        colModulo.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().modulo()));
-        colDetalle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().detalle()));
+        colUsuario.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getUsuario()));
+        colFecha.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFechaHora()));
+        colAccion.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getAccion()));
+        colModulo.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getModulo()));
+        colDetalle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getDetalle()));
 
         // Botón "Ver Fuente"
         colVer.setCellFactory(makeVerFuenteCell());
@@ -129,10 +129,10 @@ public class AuditoriaController {
         String a = cboAccion.getValue();
 
         ObservableList<AuditoriaDAO.AuditoriaDTO> filtered = master.filtered(it -> {
-            boolean byUser = "Todos los usuarios".equals(u) || it.usuario().equals(u);
-            boolean byMod  = "Todos los módulos".equals(m)  || it.modulo().equals(m);
-            boolean byAct  = "Todas las acciones".equals(a) || it.accion().equals(a);
-            boolean byTxt  = q.isEmpty() || (it.detalle().toLowerCase().contains(q) || it.usuario().toLowerCase().contains(q));
+            boolean byUser = "Todos los usuarios".equals(u) || it.getUsuario().equals(u);
+            boolean byMod  = "Todos los módulos".equals(m)  || it.getModulo().equals(m);
+            boolean byAct  = "Todas las acciones".equals(a) || it.getAccion().equals(a);
+            boolean byTxt  = q.isEmpty() || (it.getDetalle().toLowerCase().contains(q) || it.getUsuario().toLowerCase().contains(q));
             return byUser && byMod && byAct && byTxt;
         });
 
@@ -158,7 +158,7 @@ public class AuditoriaController {
         // Placeholder: exportación simple a consola. (Luego lo cambiamos a archivo real)
         System.out.println("CSV export — registros: " + tvAuditoria.getItems().size());
         tvAuditoria.getItems().forEach(r -> System.out.println(
-                r.usuario()+";"+r.fechaHora()+";"+r.accion()+";"+r.modulo()+";"+r.detalle()
+                r.getUsuario()+";"+r.getFechaHora()+";"+r.getAccion()+";"+r.getModulo()+";"+r.getDetalle()
         ));
     }
 
@@ -181,7 +181,7 @@ public class AuditoriaController {
 
     private void refreshKpis() {
         int total = tvAuditoria.getItems() == null ? 0 : tvAuditoria.getItems().size();
-        int ok = (int) tvAuditoria.getItems().stream().filter(r -> r.accion().matches("Ver|Crear|Modificar|Login")).count();
+        int ok = (int) tvAuditoria.getItems().stream().filter(r -> r.getAccion().matches("Ver|Crear|Modificar|Login")).count();
         int fail = total - ok; // placeholder
         int activos = 2;       // placeholder
 
@@ -212,6 +212,6 @@ public class AuditoriaController {
 
     private void onVerFuente(AuditoriaDAO.AuditoriaDTO dto) {
         // Placeholder: en real, abrir modal con detalle o navegar a la entidad
-        System.out.println("Ver fuente → " + dto.referencia());
+        System.out.println("Ver fuente → " + dto.getReferencia());
     }
 }

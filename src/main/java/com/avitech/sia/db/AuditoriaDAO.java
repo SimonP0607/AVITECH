@@ -36,12 +36,28 @@ public class AuditoriaDAO {
     }
 
     /* ====== DTO ====== */
-    public record AuditoriaDTO(
-            String usuario,
-            String fechaHora,
-            String accion,
-            String modulo,
-            String detalle,
-            String referencia
-    ) { }
+    public static class AuditoriaDTO {
+        private String usuario;
+        private String fechaHora;
+        private String accion;
+        private String modulo;
+        private String detalle;
+        private String referencia;
+
+        public AuditoriaDTO(String usuario, String fechaHora, String accion, String modulo, String detalle, String referencia) {
+            this.usuario = usuario;
+            this.fechaHora = fechaHora;
+            this.accion = accion;
+            this.modulo = modulo;
+            this.detalle = detalle;
+            this.referencia = referencia;
+        }
+
+        public String getUsuario() { return usuario; }
+        public String getFechaHora() { return fechaHora; }
+        public String getAccion() { return accion; }
+        public String getModulo() { return modulo; }
+        public String getDetalle() { return detalle; }
+        public String getReferencia() { return referencia; }
+    }
 }
