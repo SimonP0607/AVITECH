@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 group = 'com.avitech'
@@ -9,7 +9,10 @@ version = '0.0.1'
 repositories { mavenCentral() }
 
 java {
-    toolchain { languageVersion = JavaLanguageVersion.of(25) }
+    toolchain {
+        // Ajustado a 23 porque los jars de JavaFX (25.0.1) tienen class file version 67 (Java 23)
+        languageVersion = JavaLanguageVersion.of(23)
+    }
 }
 
 application {
@@ -17,8 +20,8 @@ application {
 }
 
 javafx {
-    version = '21'
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    version = '25.0.1'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
 }
 
 dependencies {
@@ -28,9 +31,34 @@ dependencies {
 
     // logging simple (opcional)
     implementation 'org.slf4j:slf4j-api:2.0.16'
-    runtimeOnly   'org.slf4j:slf4j-simple:2.0.16'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.16'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
 }
 
 test { useJUnitPlatform() }
+
+// Tarea de utilidad para rehash de contraseñas (dry-run por defecto)
+tasks.register('rehashPasswords', JavaExec) {
+    group = 'maintenance'
+    description = 'Detecta contraseñas en texto plano y opcionalmente las re-hashea (usa -Papply=true para aplicar)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set('com.avitech.sia.security.RehashPasswords')
+    systemProperty 'apply', project.findProperty('apply') ?: 'false'
+}
+
+// Tarea para generar un hash BCrypt desde la línea de comandos
+tasks.register('genHash', JavaExec) {
+    group = 'utility'
+    description = 'Genera un hash BCrypt para la contraseña proporcionada (usa -Ppwd=<contraseña> o pásala como argumento)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set('com.avitech.sia.security.GenerateHash')
+    systemProperty 'pwd', project.findProperty('pwd') ?: ''
+}
+
+tasks.register('dbTest', JavaExec) {
+    group = 'verification'
+    description = 'Prueba conexión a la base de datos usando DBTest'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set('com.avitech.sia.db.DBTest')
+}

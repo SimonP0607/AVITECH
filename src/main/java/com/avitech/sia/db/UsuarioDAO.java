@@ -58,4 +58,15 @@ public class UsuarioDAO {
         }
         return usernames;
     }
+
+    // Nuevo: actualizar el password hash para un usuario por id
+    public static void updatePassword(int id, String newHash) throws Exception {
+        String sql = "UPDATE Usuarios SET password=? WHERE id_usuario=?";
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, newHash);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        }
+    }
 }
