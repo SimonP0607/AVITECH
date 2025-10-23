@@ -39,7 +39,6 @@ public class ParametrosController extends BaseController {
         // vista por defecto
         show("/fxml/Parametros/parametros_unidades.fxml");
     }
-
     // Segmentos
     @FXML private void showUnidades()    { show("/fxml/Parametros/parametros_unidades.fxml"); }
     @FXML private void showCategorias()  { show("/fxml/Parametros/parametros_categorias.fxml"); }

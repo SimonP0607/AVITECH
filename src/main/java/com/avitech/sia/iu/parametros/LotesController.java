@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
 public class LotesController {
-
     @FXML private TextField txtSearch;
     @FXML private ComboBox<String> cbGalpon, cbEstado;
     @FXML private TableView<Lote> tbl;

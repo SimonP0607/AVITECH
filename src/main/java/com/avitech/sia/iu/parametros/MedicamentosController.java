@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
 public class MedicamentosController {
-
     @FXML private TextField txtSearch;
     @FXML private ComboBox<String> cbTipo, cbEstado;
     @FXML private TableView<Medicamento> tbl;

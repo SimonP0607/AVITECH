@@ -10,7 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 
 public class CategoriasController {
-
     @FXML private TextField txtSearch;
     @FXML private ComboBox<String> cbTipo, cbEstado;
     @FXML private TableView<Categoria> tbl;
