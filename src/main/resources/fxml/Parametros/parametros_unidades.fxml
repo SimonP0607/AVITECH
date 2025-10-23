@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" spacing="12"
-      fx:controller="com.avitech.sia.iu.parametros.UnidadesController">
-    <children>
-        <HBox spacing="10">
-            <children>
-                <TextField fx:id="txtSearch" promptText="Buscar..." />
-                <ComboBox fx:id="cbEstado" prefWidth="180"/>
-                <Pane HBox.hgrow="ALWAYS"/>
-                <Button text="+ Agregar" onAction="#onAgregar" styleClass="primary"/>
-            </children>
-        </HBox>
 
-        <TableView fx:id="tbl" prefHeight="420">
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="16"
+      fx:controller="com.avitech.sia.iu.parametros.UnidadesController"
+      styleClass="content">
+
+    <!-- Encabezado -->
+    <VBox spacing="6">
+        <Label text="Unidades de Medida" styleClass="h2"/>
+        <Label text="Configure las unidades utilizadas en el sistema (peso, volumen, cantidad)" styleClass="helper"/>
+    </VBox>
+
+    <!-- Barra de herramientas -->
+    <VBox styleClass="card" spacing="12">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <TextField fx:id="txtSearch" promptText="🔍 Buscar unidad..." prefWidth="280" onKeyReleased="#onSearch"/>
+            <ComboBox fx:id="cbEstado" prefWidth="180" promptText="Estado"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="+ Nueva Unidad" onAction="#onAgregar" styleClass="primary"/>
+            <Button text="↻" onAction="#onRefresh" styleClass="secondary" style="-fx-font-size: 16px;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Tabla de unidades -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS">
+        <TableView fx:id="tbl" styleClass="movement-table">
             <columns>
-                <TableColumn text="Nombre"     fx:id="cNombre"    prefWidth="180"/>
-                <TableColumn text="Símbolo"    fx:id="cSimbolo"   prefWidth="90"/>
-                <TableColumn text="Tipo"       fx:id="cTipo"      prefWidth="120"/>
-                <TableColumn text="Descripción"fx:id="cDesc"      prefWidth="260"/>
-                <TableColumn text="Estado"     fx:id="cEstado"    prefWidth="100"/>
-                <TableColumn text="Acciones"   fx:id="cAccion"    prefWidth="120"/>
+                <TableColumn text="Nombre" fx:id="cNombre" prefWidth="200"/>
+                <TableColumn text="Símbolo" fx:id="cSimbolo" prefWidth="100"/>
+                <TableColumn text="Tipo" fx:id="cTipo" prefWidth="150"/>
+                <TableColumn text="Descripción" fx:id="cDesc" prefWidth="340"/>
+                <TableColumn text="Estado" fx:id="cEstado" prefWidth="120"/>
+                <TableColumn text="Acciones" fx:id="cAccion" prefWidth="120"/>
             </columns>
+            <placeholder>
+                <Label text="No hay unidades registradas" styleClass="helper"/>
+            </placeholder>
         </TableView>
-    </children>
+    </VBox>
+
+    <padding><Insets topRightBottomLeft="4"/></padding>
 </VBox>

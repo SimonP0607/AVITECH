@@ -1,28 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" spacing="12"
-      fx:controller="com.avitech.sia.iu.parametros.MedicamentosController">
-    <children>
-        <HBox spacing="10">
-            <children>
-                <TextField fx:id="txtSearch" promptText="Buscar..." />
-                <ComboBox fx:id="cbEstado" prefWidth="180"/>
-                <Pane HBox.hgrow="ALWAYS"/>
-                <Button text="+ Agregar" onAction="#onAgregar" styleClass="primary"/>
-            </children>
-        </HBox>
 
-        <TableView fx:id="tbl" prefHeight="420">
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="16"
+      fx:controller="com.avitech.sia.iu.parametros.MedicamentosController"
+      styleClass="content">
+
+    <!-- Encabezado -->
+    <VBox spacing="6">
+        <Label text="Medicamentos y Vacunas" styleClass="h2"/>
+        <Label text="Catálogo de productos veterinarios, vacunas y tratamientos" styleClass="helper"/>
+    </VBox>
+
+    <!-- Barra de herramientas -->
+    <VBox styleClass="card" spacing="12">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <TextField fx:id="txtSearch" promptText="🔍 Buscar medicamento..." prefWidth="280" onKeyReleased="#onSearch"/>
+            <ComboBox fx:id="cbTipo" prefWidth="180" promptText="Tipo"/>
+            <ComboBox fx:id="cbEstado" prefWidth="180" promptText="Estado"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="+ Nuevo Medicamento" onAction="#onAgregar" styleClass="primary"/>
+            <Button text="↻" onAction="#onRefresh" styleClass="secondary" style="-fx-font-size: 16px;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Tabla de medicamentos -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS">
+        <TableView fx:id="tbl" styleClass="movement-table">
             <columns>
-                <TableColumn text="Nombre"         fx:id="cNombre"      prefWidth="220"/>
-                <TableColumn text="Principio Activo" fx:id="cPActivo"   prefWidth="200"/>
-                <TableColumn text="Tipo"           fx:id="cTipo"        prefWidth="120"/>
-                <TableColumn text="Dosis"          fx:id="cDosis"       prefWidth="160"/>
-                <TableColumn text="Retiro (d)"     fx:id="cRetiro"      prefWidth="110"/>
-                <TableColumn text="Estado"         fx:id="cEstado"      prefWidth="100"/>
-                <TableColumn text="Acciones"       fx:id="cAccion"      prefWidth="120"/>
+                <TableColumn text="Nombre" fx:id="cNombre" prefWidth="220"/>
+                <TableColumn text="Principio Activo" fx:id="cPActivo" prefWidth="200"/>
+                <TableColumn text="Tipo" fx:id="cTipo" prefWidth="130"/>
+                <TableColumn text="Dosis Recomendada" fx:id="cDosis" prefWidth="170"/>
+                <TableColumn text="Retiro (días)" fx:id="cRetiro" prefWidth="110"/>
+                <TableColumn text="Estado" fx:id="cEstado" prefWidth="100"/>
+                <TableColumn text="Acciones" fx:id="cAccion" prefWidth="120"/>
             </columns>
+            <placeholder>
+                <Label text="No hay medicamentos registrados" styleClass="helper"/>
+            </placeholder>
         </TableView>
-    </children>
+    </VBox>
+
+    <padding><Insets topRightBottomLeft="4"/></padding>
 </VBox>

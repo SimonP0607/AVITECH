@@ -37,7 +37,7 @@ public class ParametrosController extends BaseController {
         lblUserInfo.setText("Administrador");
 
         // vista por defecto
-        show("/fxml/parametros_unidades.fxml");
+        show("/fxml/Parametros/parametros_unidades.fxml");
     }
 
     // Segmentos
