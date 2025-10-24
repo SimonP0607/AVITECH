@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="modalRoot"
+           fx:controller="com.avitech.sia.iu.parametros.NuevaUbicacionController"
+           styleClass="modal-root">
+
+    <!-- overlay -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- card -->
+    <BorderPane
+            minWidth="600"
+            prefWidth="${modalRoot.width - 80}"
+            maxWidth="850"
+            minHeight="480"
+            prefHeight="${modalRoot.height - 100}"
+            maxHeight="750"
+            styleClass="modal-card"
+            StackPane.alignment="CENTER">
+
+        <!-- header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label fx:id="lblTitle" text="Nueva Ubicación" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- body -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="16" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+
+                            <Label text="Registre una nueva ubicación física del sistema" styleClass="helper"/>
+
+                            <GridPane hgap="12" vgap="14">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <!-- Fila 1 -->
+                                <Label text="Nombre *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtNombre" promptText="Ej: Almacén Principal"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Tipo *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbTipo" promptText="Seleccionar tipo"
+                                         GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <!-- Fila 2 -->
+                                <Label text="Capacidad *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtCapacidad" promptText="Ej: 500 m² o 5000 aves"
+                                          GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Responsable" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbResponsable" promptText="Seleccionar responsable" editable="true"
+                                         GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <!-- Fila 3 -->
+                                <Label text="Código/Identificador" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtCodigo" promptText="Código interno (opcional)"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Estado *" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbEstado" promptText="Seleccionar estado"
+                                         GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                                <!-- Descripción (span completo) -->
+                                <Label text="Descripción" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtDescripcion" promptText="Descripción detallada de la ubicación (opcional)"
+                                         prefRowCount="3" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                                <!-- Dirección/Observaciones (span completo) -->
+                                <Label text="Ubicación física" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtDireccion" promptText="Dirección, coordenadas o indicaciones de acceso (opcional)"
+                                         prefRowCount="2" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                            </GridPane>
+
+                            <!-- nota -->
+                            <VBox styleClass="note-info">
+                                <children>
+                                    <Label text="Nota:" styleClass="note-title"/>
+                                    <Label text="Las ubicaciones se utilizan para organizar el inventario y hacer seguimiento de los bienes de la empresa. Puede registrar galpones, almacenes, bodegas, áreas de proceso, etc."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- footer -->
+        <bottom>
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="secondaryBtn"/>
+                    <Button fx:id="btnGuardar" text="Guardar" styleClass="primaryBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+
+</StackPane>
+

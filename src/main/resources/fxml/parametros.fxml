@@ -3,8 +3,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.avitech.sia.iu.parametros.ParametrosController">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:id="overlayHost"
+           fx:controller="com.avitech.sia.iu.parametros.ParametrosController">
+
+<BorderPane>
     <!-- SIDEBAR (igual a las otras pantallas) -->
     <left>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="270" styleClass="side-scroll">
@@ -62,16 +65,78 @@
                         <Label text="Parámetros del Sistema" styleClass="h2"/>
                         <Label text="Configuración de unidades, categorías, medicamentos, lotes y ubicaciones" styleClass="helper"/>
 
-                        <!-- Segmentos -->
-                        <HBox spacing="8">
-                            <children>
-                                <ToggleButton fx:id="btnUnidades"    text=" Unidades"     onAction="#showUnidades"    selected="true"/>
-                                <ToggleButton fx:id="btnCategorias"  text=" Categorías"   onAction="#showCategorias"/>
-                                <ToggleButton fx:id="btnMedicamentos" text=" Medicamentos" onAction="#showMedicamentos"/>
-                                <ToggleButton fx:id="btnLotes"       text=" Lotes"        onAction="#showLotes"/>
-                                <ToggleButton fx:id="btnUbicaciones" text=" Ubicaciones"  onAction="#showUbicaciones"/>
-                            </children>
-                        </HBox>
+                        <!-- Segmentos mejorados con iconos y diseño moderno -->
+                        <VBox spacing="12">
+                            <Label text="Seleccione una sección:" styleClass="helper" style="-fx-font-weight: 600;"/>
+
+                            <fx:define>
+                                <ToggleGroup fx:id="tabGroup"/>
+                            </fx:define>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-wrap-text: true;">
+                                <children>
+                                    <ToggleButton fx:id="btnUnidades" onAction="#showUnidades" selected="true"
+                                                  toggleGroup="$tabGroup"
+                                                  styleClass="tab-segment" prefWidth="160" prefHeight="70">
+                                        <graphic>
+                                            <VBox alignment="CENTER" spacing="4">
+                                                <Label text="📏" style="-fx-font-size: 24px;"/>
+                                                <Label text="Unidades" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                                                <Label text="Medidas" style="-fx-font-size: 10px; -fx-opacity: 0.7;"/>
+                                            </VBox>
+                                        </graphic>
+                                    </ToggleButton>
+
+                                    <ToggleButton fx:id="btnCategorias" onAction="#showCategorias"
+                                                  toggleGroup="$tabGroup"
+                                                  styleClass="tab-segment" prefWidth="160" prefHeight="70">
+                                        <graphic>
+                                            <VBox alignment="CENTER" spacing="4">
+                                                <Label text="🏷️" style="-fx-font-size: 24px;"/>
+                                                <Label text="Categorías" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                                                <Label text="Clasificación" style="-fx-font-size: 10px; -fx-opacity: 0.7;"/>
+                                            </VBox>
+                                        </graphic>
+                                    </ToggleButton>
+
+                                    <ToggleButton fx:id="btnMedicamentos" onAction="#showMedicamentos"
+                                                  toggleGroup="$tabGroup"
+                                                  styleClass="tab-segment" prefWidth="160" prefHeight="70">
+                                        <graphic>
+                                            <VBox alignment="CENTER" spacing="4">
+                                                <Label text="💊" style="-fx-font-size: 24px;"/>
+                                                <Label text="Medicamentos" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                                                <Label text="Veterinarios" style="-fx-font-size: 10px; -fx-opacity: 0.7;"/>
+                                            </VBox>
+                                        </graphic>
+                                    </ToggleButton>
+
+                                    <ToggleButton fx:id="btnLotes" onAction="#showLotes"
+                                                  toggleGroup="$tabGroup"
+                                                  styleClass="tab-segment" prefWidth="160" prefHeight="70">
+                                        <graphic>
+                                            <VBox alignment="CENTER" spacing="4">
+                                                <Label text="🐔" style="-fx-font-size: 24px;"/>
+                                                <Label text="Lotes" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                                                <Label text="Aves" style="-fx-font-size: 10px; -fx-opacity: 0.7;"/>
+                                            </VBox>
+                                        </graphic>
+                                    </ToggleButton>
+
+                                    <ToggleButton fx:id="btnUbicaciones" onAction="#showUbicaciones"
+                                                  toggleGroup="$tabGroup"
+                                                  styleClass="tab-segment" prefWidth="160" prefHeight="70">
+                                        <graphic>
+                                            <VBox alignment="CENTER" spacing="4">
+                                                <Label text="📍" style="-fx-font-size: 24px;"/>
+                                                <Label text="Ubicaciones" style="-fx-font-weight: 600; -fx-font-size: 13px;"/>
+                                                <Label text="Espacios" style="-fx-font-size: 10px; -fx-opacity: 0.7;"/>
+                                            </VBox>
+                                        </graphic>
+                                    </ToggleButton>
+                                </children>
+                            </HBox>
+                        </VBox>
 
                         <!-- Contenedor de sub-vistas -->
                         <StackPane fx:id="contentStack" VBox.vgrow="ALWAYS" />
@@ -82,3 +147,6 @@
         </ScrollPane>
     </center>
 </BorderPane>
+
+</StackPane>
+

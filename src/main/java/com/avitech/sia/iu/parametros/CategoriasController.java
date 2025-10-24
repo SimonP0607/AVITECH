@@ -1,5 +1,6 @@
 package com.avitech.sia.iu.parametros;
 
+import com.avitech.sia.iu.ModalUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -137,13 +138,46 @@ public class CategoriasController {
 
     @FXML
     private void onAgregar() {
-        // TODO: Abrir diálogo para agregar nueva categoría
-        System.out.println("📝 Agregar nueva categoría");
+        // Abrir modal para agregar nueva categoría
+        NuevaCategoriaController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_categoria.fxml",
+                "Nueva Categoría"
+        );
+
+        if (ctrl != null && ctrl.getResult() != null) {
+            // Agregar a la lista
+            master.add(ctrl.getResult());
+            applyFilters();
+
+            // TODO: Aquí se insertará en la base de datos
+            System.out.println("✅ Nueva categoría agregada: " + ctrl.getResult().nombre);
+        }
     }
 
     private void onEditar(Categoria categoria) {
-        // TODO: Abrir diálogo para editar
-        System.out.println("✎ Editar categoría: " + categoria.nombre);
+        // Abrir modal para editar categoría
+        NuevaCategoriaController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_categoria.fxml",
+                "Editar Categoría"
+        );
+
+        if (ctrl != null) {
+            ctrl.setEditMode(categoria);
+
+            if (ctrl.getResult() != null) {
+                // Actualizar en la lista
+                int index = master.indexOf(categoria);
+                if (index >= 0) {
+                    master.set(index, ctrl.getResult());
+                    applyFilters();
+
+                    // TODO: Aquí se actualizará en la base de datos
+                    System.out.println("✅ Categoría actualizada: " + ctrl.getResult().nombre);
+                }
+            }
+        }
     }
 
     private void onEliminar(Categoria categoria) {

@@ -1,5 +1,6 @@
 package com.avitech.sia.iu.parametros;
 
+import com.avitech.sia.iu.ModalUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -119,18 +120,60 @@ public class LotesController {
 
     @FXML
     private void onAgregar() {
-        // TODO: Abrir diálogo para agregar nuevo lote
-        System.out.println("📝 Agregar nuevo lote");
+        // Abrir modal para agregar nuevo lote
+        NuevoLoteController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_lote.fxml",
+                "Nuevo Lote de Aves"
+        );
+
+        if (ctrl != null && ctrl.getResult() != null) {
+            // Agregar a la lista
+            master.add(ctrl.getResult());
+            applyFilters();
+
+            // TODO: Aquí se insertará en la base de datos
+            System.out.println("✅ Nuevo lote agregado: " + ctrl.getResult().nombre);
+        }
     }
 
     private void onVer(Lote lote) {
-        // TODO: Mostrar detalles completos del lote
-        System.out.println("👁 Ver detalles de: " + lote.nombre);
+        // Abrir modal en modo solo lectura/vista detallada
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Detalles del Lote");
+        alert.setHeaderText(lote.nombre);
+        alert.setContentText(String.format(
+                "Aves: %s\nEdad: %s semanas\nRaza: %s\nGalpón: %s\nFecha Ingreso: %s\nEstado: %s",
+                lote.aves, lote.edad, lote.raza, lote.galpon, lote.fechaIngreso, lote.estado
+        ));
+        alert.showAndWait();
+
+        // TODO: Crear una vista detallada más completa con historial de producción, sanidad, etc.
     }
 
     private void onEditar(Lote lote) {
-        // TODO: Abrir diálogo para editar
-        System.out.println("✎ Editar lote: " + lote.nombre);
+        // Abrir modal para editar lote
+        NuevoLoteController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_lote.fxml",
+                "Editar Lote de Aves"
+        );
+
+        if (ctrl != null) {
+            ctrl.setEditMode(lote);
+
+            if (ctrl.getResult() != null) {
+                // Actualizar en la lista
+                int index = master.indexOf(lote);
+                if (index >= 0) {
+                    master.set(index, ctrl.getResult());
+                    applyFilters();
+
+                    // TODO: Aquí se actualizará en la base de datos
+                    System.out.println("✅ Lote actualizado: " + ctrl.getResult().nombre);
+                }
+            }
+        }
     }
 
     public static class Lote {

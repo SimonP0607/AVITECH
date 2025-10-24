@@ -1,5 +1,6 @@
 package com.avitech.sia.iu.parametros;
 
+import com.avitech.sia.iu.ModalUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -121,13 +122,46 @@ public class UbicacionesController {
 
     @FXML
     private void onAgregar() {
-        // TODO: Abrir diálogo para agregar nueva ubicación
-        System.out.println("📝 Agregar nueva ubicación");
+        // Abrir modal para agregar nueva ubicación
+        NuevaUbicacionController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_ubicacion.fxml",
+                "Nueva Ubicación"
+        );
+
+        if (ctrl != null && ctrl.getResult() != null) {
+            // Agregar a la lista
+            master.add(ctrl.getResult());
+            applyFilters();
+
+            // TODO: Aquí se insertará en la base de datos
+            System.out.println("✅ Nueva ubicación agregada: " + ctrl.getResult().nombre);
+        }
     }
 
     private void onEditar(Ubicacion ubicacion) {
-        // TODO: Abrir diálogo para editar
-        System.out.println("✎ Editar ubicación: " + ubicacion.nombre);
+        // Abrir modal para editar ubicación
+        NuevaUbicacionController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_ubicacion.fxml",
+                "Editar Ubicación"
+        );
+
+        if (ctrl != null) {
+            ctrl.setEditMode(ubicacion);
+
+            if (ctrl.getResult() != null) {
+                // Actualizar en la lista
+                int index = master.indexOf(ubicacion);
+                if (index >= 0) {
+                    master.set(index, ctrl.getResult());
+                    applyFilters();
+
+                    // TODO: Aquí se actualizará en la base de datos
+                    System.out.println("✅ Ubicación actualizada: " + ctrl.getResult().nombre);
+                }
+            }
+        }
     }
 
     private void onEliminar(Ubicacion ubicacion) {

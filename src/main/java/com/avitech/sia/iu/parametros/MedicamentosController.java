@@ -1,5 +1,6 @@
 package com.avitech.sia.iu.parametros;
 
+import com.avitech.sia.iu.ModalUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -119,13 +120,46 @@ public class MedicamentosController {
 
     @FXML
     private void onAgregar() {
-        // TODO: Abrir diálogo para agregar nuevo medicamento
-        System.out.println("📝 Agregar nuevo medicamento");
+        // Abrir modal para agregar nuevo medicamento
+        NuevoMedicamentoController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_medicamento.fxml",
+                "Nuevo Medicamento"
+        );
+
+        if (ctrl != null && ctrl.getResult() != null) {
+            // Agregar a la lista
+            master.add(ctrl.getResult());
+            applyFilters();
+
+            // TODO: Aquí se insertará en la base de datos
+            System.out.println("✅ Nuevo medicamento agregado: " + ctrl.getResult().nombre);
+        }
     }
 
     private void onEditar(Medicamento med) {
-        // TODO: Abrir diálogo para editar
-        System.out.println("✎ Editar medicamento: " + med.nombre);
+        // Abrir modal para editar medicamento
+        NuevoMedicamentoController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_medicamento.fxml",
+                "Editar Medicamento"
+        );
+
+        if (ctrl != null) {
+            ctrl.setEditMode(med);
+
+            if (ctrl.getResult() != null) {
+                // Actualizar en la lista
+                int index = master.indexOf(med);
+                if (index >= 0) {
+                    master.set(index, ctrl.getResult());
+                    applyFilters();
+
+                    // TODO: Aquí se actualizará en la base de datos
+                    System.out.println("✅ Medicamento actualizado: " + ctrl.getResult().nombre);
+                }
+            }
+        }
     }
 
     private void onEliminar(Medicamento med) {

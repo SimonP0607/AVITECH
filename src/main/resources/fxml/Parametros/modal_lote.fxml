@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="modalRoot"
+           fx:controller="com.avitech.sia.iu.parametros.NuevoLoteController"
+           styleClass="modal-root">
+
+    <!-- overlay -->
+    <Pane styleClass="modal-overlay" pickOnBounds="true" StackPane.alignment="CENTER"/>
+
+    <!-- card -->
+    <BorderPane
+            minWidth="650"
+            prefWidth="${modalRoot.width - 80}"
+            maxWidth="900"
+            minHeight="520"
+            prefHeight="${modalRoot.height - 100}"
+            maxHeight="800"
+            styleClass="modal-card"
+            StackPane.alignment="CENTER">
+
+        <!-- header -->
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="modal-header">
+                <children>
+                    <Label fx:id="lblTitle" text="Nuevo Lote de Aves" styleClass="h3"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnClose" text="✕" styleClass="ghostBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </top>
+
+        <!-- body -->
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox spacing="16" fillWidth="true" maxWidth="Infinity" styleClass="content">
+                        <children>
+
+                            <Label text="Registre un nuevo lote de aves en el sistema" styleClass="helper"/>
+
+                            <GridPane hgap="12" vgap="14">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints minWidth="150"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <!-- Fila 1 -->
+                                <Label text="Código de Lote *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtNombre" promptText="Ej: Lote A-2024-001"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Cantidad de Aves *" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtAves" promptText="Ej: 5000"
+                                          GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <!-- Fila 2 -->
+                                <Label text="Raza/Línea *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbRaza" promptText="Seleccionar raza"
+                                         GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Galpón Asignado *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="cbGalpon" promptText="Seleccionar galpón"
+                                         GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                <!-- Fila 3 -->
+                                <Label text="Fecha de Ingreso *" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <DatePicker fx:id="dpFechaIngreso" promptText="Fecha"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Edad Inicial (semanas)" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtEdadInicial" promptText="0" text="0"
+                                          GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                                <!-- Fila 4 -->
+                                <Label text="Proveedor" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtProveedor" promptText="Nombre del proveedor"
+                                          GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                <Label text="Peso Promedio Inicial (g)" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                                <TextField fx:id="txtPesoInicial" promptText="Ej: 45"
+                                          GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+
+                                <!-- Fila 5 -->
+                                <Label text="Estado *" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <ComboBox fx:id="cbEstado" promptText="Seleccionar estado"
+                                         GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                <!-- Observaciones (span completo) -->
+                                <Label text="Observaciones" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="txtObservaciones" promptText="Observaciones generales sobre el lote (opcional)"
+                                         prefRowCount="3" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                            </GridPane>
+
+                            <!-- nota -->
+                            <VBox styleClass="note-info">
+                                <children>
+                                    <Label text="Nota:" styleClass="note-title"/>
+                                    <Label text="El código de lote debe ser único. Se recomienda usar un formato que incluya el año y un número secuencial (ej: A-2024-001). El lote quedará activo y se podrá hacer seguimiento de producción y sanidad."
+                                           wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                        </children>
+                        <padding><Insets topRightBottomLeft="16"/></padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+
+        <!-- footer -->
+        <bottom>
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="modal-footer">
+                <children>
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="secondaryBtn"/>
+                    <Button fx:id="btnGuardar" text="Guardar" styleClass="primaryBtn"/>
+                </children>
+                <padding><Insets topRightBottomLeft="12"/></padding>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+
+</StackPane>
+

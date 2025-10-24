@@ -57,12 +57,12 @@ public class ParametrosController extends BaseController {
 
     /* ====== NAV (mismo patrón del proyecto) ====== */
     @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
-    @FXML private void goSupplies()   { App.goTo("/fxml/suministros.fxml",     "SIA Avitech — Suministros"); }
+    @FXML private void goSupplies()   { App.goTo("/fxml/suministros/suministros.fxml",     "SIA Avitech — Suministros"); }
     @FXML private void goHealth()     { App.goTo("/fxml/sanidad/sanidad.fxml",         "SIA Avitech — Sanidad"); }
     @FXML private void goProduction() { App.goTo("/fxml/produccion/produccion.fxml",      "SIA Avitech — Producción"); }
     @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml",        "SIA Avitech — Reportes"); }
-    @FXML private void goAlerts()     { App.goTo("/fxml/alertas.fxml",         "SIA Avitech — Alertas"); }
-    @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml",       "SIA Avitech — Auditoría"); }
+    @FXML private void goAlerts()     { App.goTo("/fxml/alertas/alertas.fxml",         "SIA Avitech — Alertas"); }
+    @FXML private void goAudit()      { App.goTo("/fxml/auditoria/auditoria.fxml",       "SIA Avitech — Auditoría"); }
     @FXML private void goParams()     { /* ya estás aquí */ }
     @FXML private void goUsers()      { App.goTo("/fxml/usuarios/usuarios.fxml",        "SIA Avitech — Usuarios"); }
     @FXML private void goBackup()     { App.goTo("/fxml/respaldos/respaldos.fxml",       "SIA Avitech — Respaldos"); }

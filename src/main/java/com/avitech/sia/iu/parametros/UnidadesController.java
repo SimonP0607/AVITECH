@@ -1,5 +1,6 @@
 package com.avitech.sia.iu.parametros;
 
+import com.avitech.sia.iu.ModalUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -112,15 +113,46 @@ public class UnidadesController {
 
     @FXML
     private void onAgregar() {
-        // TODO: Abrir diálogo para agregar nueva unidad
-        // Al guardar, insertar en BD y recargar
-        System.out.println("📝 Agregar nueva unidad");
+        // Abrir modal para agregar nueva unidad
+        NuevaUnidadController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_unidad.fxml",
+                "Nueva Unidad de Medida"
+        );
+
+        if (ctrl != null && ctrl.getResult() != null) {
+            // Agregar a la lista
+            master.add(ctrl.getResult());
+            applyFilters();
+
+            // TODO: Aquí se insertará en la base de datos
+            System.out.println("✅ Nueva unidad agregada: " + ctrl.getResult().nombre);
+        }
     }
 
     private void onEditar(Unidad unidad) {
-        // TODO: Abrir diálogo para editar unidad
-        // Al guardar, actualizar en BD y recargar
-        System.out.println("✎ Editar unidad: " + unidad.nombre);
+        // Abrir modal para editar unidad
+        NuevaUnidadController ctrl = ModalUtil.openModal(
+                tbl,
+                "/fxml/Parametros/modal_unidad.fxml",
+                "Editar Unidad de Medida"
+        );
+
+        if (ctrl != null) {
+            ctrl.setEditMode(unidad);
+
+            if (ctrl.getResult() != null) {
+                // Actualizar en la lista
+                int index = master.indexOf(unidad);
+                if (index >= 0) {
+                    master.set(index, ctrl.getResult());
+                    applyFilters();
+
+                    // TODO: Aquí se actualizará en la base de datos
+                    System.out.println("✅ Unidad actualizada: " + ctrl.getResult().nombre);
+                }
+            }
+        }
     }
 
     private void onEliminar(Unidad unidad) {
