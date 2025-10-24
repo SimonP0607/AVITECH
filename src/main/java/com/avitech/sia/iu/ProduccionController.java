@@ -136,7 +136,8 @@ public class ProduccionController {
                     Integer.parseInt(tfHuevosB.getText()),
                     Integer.parseInt(tfHuevosA.getText()),
                     Integer.parseInt(tfHuevosAA.getText()),
-                    Integer.parseInt(tfHuevosAAA.getText())
+                    Integer.parseInt(tfHuevosAAA.getText()),
+                    lblUserInfo.getText() // Añadido el campo responsable
             );
             ProduccionDAO.guardarProduccion(dto);
             new Alert(Alert.AlertType.INFORMATION, "Registro de producción guardado exitosamente.").showAndWait();

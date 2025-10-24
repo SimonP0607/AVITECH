@@ -11,5 +11,6 @@ public record ProduccionDTO(
         int huevosB, // Mapeado a huevos_S en DB
         int huevosA, // Mapeado a huevos_M en DB
         int huevosAA, // Mapeado a huevos_L en DB
-        int huevosAAA // Se sumará a huevos_L en DB
+        int huevosAAA, // Se sumará a huevos_L en DB
+        String responsable
 ) { }
