@@ -29,6 +29,10 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.1.0'
     implementation 'at.favre.lib:bcrypt:0.10.2'
 
+    // Apache POI para generación de Excel
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
     // logging simple (opcional)
     implementation 'org.slf4j:slf4j-api:2.0.16'
     runtimeOnly 'org.slf4j:slf4j-simple:2.0.16'
