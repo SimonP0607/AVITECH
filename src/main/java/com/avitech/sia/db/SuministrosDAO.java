@@ -5,38 +5,94 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SuministrosDAO {
 
     public static List<Mov> getAll() throws Exception {
-        List<Mov> resultados = new ArrayList<>();
-        String sql = "SELECT fecha, tipo, item, cantidad, unidad, responsable, motivo FROM Suministros ORDER BY fecha DESC";
+        List<Mov> allMovementsAsc = new ArrayList<>();
+        String sqlFetchAll = "SELECT id_movimiento, fecha, tipo, item, cantidad, unidad, responsable, motivo, valor_total FROM Suministros ORDER BY fecha ASC, id_movimiento ASC";
 
         try (Connection cn = DB.get();
-             PreparedStatement ps = cn.prepareStatement(sql);
+             PreparedStatement ps = cn.prepareStatement(sqlFetchAll);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                resultados.add(new Mov(
-                        rs.getDate("fecha").toLocalDate().toString(), // Simplificado a fecha
+                allMovementsAsc.add(new Mov(
+                        rs.getDate("fecha").toLocalDate().toString(),
                         rs.getString("item"),
                         String.valueOf(rs.getInt("cantidad")),
                         rs.getString("unidad"),
                         rs.getString("tipo"),
                         rs.getString("responsable"),
                         rs.getString("motivo"),
-                        "—" // Columna de stock no está en la tabla
+                        null // El stock se calculará más tarde
                 ));
             }
         }
-        return resultados;
+
+        Map<String, Integer> itemCurrentStockMap = new HashMap<>();
+        for (InventarioItem item : getInventario()) {
+            itemCurrentStockMap.put(item.producto, item.stock);
+        }
+
+        List<Mov> resultsDesc = new ArrayList<>();
+        for (int i = allMovementsAsc.size() - 1; i >= 0; i--) {
+            Mov currentMov = allMovementsAsc.get(i);
+            String item = currentMov.item;
+            int quantity = Integer.parseInt(currentMov.cantidad);
+            String type = currentMov.tipo;
+
+            int stockAfterThisMovement = itemCurrentStockMap.getOrDefault(item, 0);
+
+            resultsDesc.add(new Mov(
+                    currentMov.fecha,
+                    currentMov.item,
+                    currentMov.cantidad,
+                    currentMov.unidad,
+                    currentMov.tipo,
+                    currentMov.responsable,
+                    currentMov.detalles,
+                    String.valueOf(stockAfterThisMovement) // Este es el stock *después* de este movimiento
+            ));
+
+            if ("Entrada".equalsIgnoreCase(type)) {
+                itemCurrentStockMap.put(item, stockAfterThisMovement - quantity);
+            } else if ("Salida".equalsIgnoreCase(type)) {
+                itemCurrentStockMap.put(item, stockAfterThisMovement + quantity);
+            }
+        }
+
+        return resultsDesc; // Esta lista ya está en orden descendente de fecha
+    }
+
+    public static double getValorTotalStock() throws Exception {
+        String sql = """
+            SELECT SUM(CASE WHEN tipo = 'Entrada' THEN valor_total ELSE -valor_total END) as valor_total_inventario
+            FROM Suministros
+            WHERE item NOT IN (SELECT nombre FROM Medicamentos);
+        """;
+
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getDouble("valor_total_inventario");
+            }
+        }
+        return 0.0;
     }
 
     public static List<InventarioItem> getInventario() throws Exception {
         List<InventarioItem> resultados = new ArrayList<>();
         String sql = "SELECT item, unidad, SUM(CASE WHEN tipo = 'Entrada' THEN cantidad ELSE -cantidad END) as stock_actual " +
-                     "FROM Suministros GROUP BY item, unidad ORDER BY item";
+                     "FROM Suministros " +
+                     "WHERE item NOT IN (SELECT nombre FROM Medicamentos) " +
+                     "GROUP BY item, unidad ORDER BY item";
 
         try (Connection cn = DB.get();
              PreparedStatement ps = cn.prepareStatement(sql);
@@ -55,7 +111,7 @@ public class SuministrosDAO {
 
     public static List<String> getProductos() throws Exception {
         List<String> resultados = new ArrayList<>();
-        String sql = "SELECT DISTINCT item FROM Suministros ORDER BY item";
+        String sql = "SELECT DISTINCT item FROM Suministros WHERE item NOT IN (SELECT nombre FROM Medicamentos) ORDER BY item";
         try (Connection cn = DB.get();
              PreparedStatement ps = cn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -66,9 +122,8 @@ public class SuministrosDAO {
         return resultados;
     }
 
-    public static void addMovimiento(String item, int cantidad, String tipo, String motivo, String responsable) throws Exception {
-        String unidad = getUnidadForItem(item);
-        String sql = "INSERT INTO Suministros (fecha, item, cantidad, unidad, tipo, motivo, responsable) VALUES (NOW(), ?, ?, ?, ?, ?, ?)";
+    public static void addMovimiento(String item, int cantidad, String unidad, String proveedor, double valorTotal, String tipo, String motivo, String responsable) throws Exception {
+        String sql = "INSERT INTO Suministros (fecha, item, cantidad, unidad, tipo, motivo, responsable, proveedor, valor_total) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection cn = DB.get();
              PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -78,6 +133,8 @@ public class SuministrosDAO {
             ps.setString(4, tipo);
             ps.setString(5, motivo);
             ps.setString(6, responsable);
+            ps.setString(7, proveedor);
+            ps.setDouble(8, valorTotal);
             ps.executeUpdate();
         }
     }
@@ -112,11 +169,10 @@ public class SuministrosDAO {
             this.detalles = detalles;
             this.stock = stock;
 
-            this.itemLc = item.toLowerCase();
-            this.detallesLc = detalles.toLowerCase();
-            this.respLc = responsable.toLowerCase();
+            this.itemLc = item != null ? item.toLowerCase() : "";
+            this.detallesLc = detalles != null ? detalles.toLowerCase() : "";
+            this.respLc = responsable != null ? responsable.toLowerCase() : "";
 
-            // intenta parsear yyyy-MM-dd desde el prefijo de fecha
             LocalDate ld = null;
             try {
                 ld = LocalDate.parse(fecha.substring(0, 10));

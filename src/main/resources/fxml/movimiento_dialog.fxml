@@ -16,13 +16,22 @@
         </columnConstraints>
 
         <Label text="Producto:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbProducto" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <ComboBox fx:id="cbProducto" promptText="Seleccionar producto" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
         <Label text="Cantidad:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="txtCantidad" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtCantidad" promptText="Ej: 10" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="Motivo/Detalle:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <TextArea fx:id="txtDetalle" GridPane.rowIndex="2" GridPane.columnIndex="1" prefRowCount="3"/>
+        <Label text="Unidad:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtUnidad" promptText="Ej: kg, unidad, saco" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Proveedor:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtProveedor" promptText="Nombre del proveedor" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Valor Total:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtValorTotal" promptText="Ej: 150.50" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Motivo/Detalle:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <TextArea fx:id="txtDetalle" GridPane.rowIndex="5" GridPane.columnIndex="1" prefRowCount="3"/>
 
     </GridPane>
 

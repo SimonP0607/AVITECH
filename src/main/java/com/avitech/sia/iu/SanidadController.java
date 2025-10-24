@@ -1,189 +1,176 @@
 package com.avitech.sia.iu;
 
-
+import com.avitech.sia.App;
+import com.avitech.sia.db.SanidadDAO;
+import com.avitech.sia.iu.ModalUtil;
 import com.avitech.sia.iu.sanidad.RegAplicacionController;
 import com.avitech.sia.iu.sanidad.RegEventoController;
 import com.avitech.sia.iu.sanidad.dto.AplicacionDTO;
 import com.avitech.sia.iu.sanidad.dto.EventoDTO;
-
-import com.avitech.sia.App;
 import javafx.beans.property.*;
-import javafx.collections.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ProgressBarTableCell;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SanidadController {
 
-    // Top / sidebar
     @FXML private Label lblSystemStatus, lblHeader, lblUserInfo;
-
-    // KPIs
-    @FXML private Label kpiAplicaciones, kpiAplicacionesDelta, kpiMortalidad,
-            kpiCasosActivos, kpiMedStock, kpiMedBajos;
-
-    // Planes sanitarios
+    @FXML private Label kpiAplicaciones, kpiAplicacionesDelta, kpiMortalidad, kpiCasosActivos, kpiMedStock, kpiMedBajos;
     @FXML private TableView<PlanRow> tblPlanes;
     @FXML private TableColumn<PlanRow, String> colPlan, colDesc, colEdad, colEstadoPlan;
-
-    // Medicamentos
     @FXML private TableView<MedRow> tblMedicamentos;
     @FXML private TableColumn<MedRow, String> colMed, colStock, colInv;
     @FXML private TableColumn<MedRow, Double> colBar;
-
-    // Filtros
-    @FXML private TextField  txtBuscar;
+    @FXML private TextField txtBuscar;
     @FXML private ComboBox<String> cbGalpon, cbMedicamento;
     @FXML private DatePicker dpDesde, dpHasta;
-    @FXML private Button btnRegistrarAplicacion;
-    @FXML private Button btnRegistrarEvento;
+    @FXML private Button btnRegistrarAplicacion, btnRegistrarEvento;
+
+    private final ObservableList<PlanRow> planesData = FXCollections.observableArrayList();
+    private final ObservableList<MedRow> medicamentosData = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
-        // Estado cabecera (puedes traerlo de config)
         lblHeader.setText("Administrador");
         lblUserInfo.setText("Administrador");
-        lblSystemStatus.setText("Sistema Offline – MySQL Local");
+        lblSystemStatus.setText("Sistema Online – MySQL Local");
+        setupTableColumns();
+        loadFilters();
+        refreshData();
+    }
 
-        // ------ KPIs demo ------
-        kpiAplicaciones.setText("3");
-        kpiAplicacionesDelta.setText("2 completados");
-        kpiMortalidad.setText("3");
-        kpiCasosActivos.setText("0");
-        kpiMedStock.setText("3");
-        kpiMedBajos.setText("1 bajo");
-
-        // ------ Planes ------
-        colPlan.setCellValueFactory(d -> d.getValue().planProperty());
-        colDesc.setCellValueFactory(d -> d.getValue().descProperty());
-        colEdad.setCellValueFactory(d -> d.getValue().edadProperty());
+    private void setupTableColumns() {
+        colPlan.setCellValueFactory(d -> d.getValue().nombreEnfermedadProperty());
+        colDesc.setCellValueFactory(d -> d.getValue().descripcionProperty());
+        colEdad.setCellValueFactory(d -> d.getValue().medicamentoProperty()); // Re-propósito de la columna
         colEstadoPlan.setCellValueFactory(d -> d.getValue().estadoProperty());
+        tblPlanes.setItems(planesData);
 
-        ObservableList<PlanRow> planes = FXCollections.observableArrayList(
-                new PlanRow("Programa Vacunación Ponedoras",
-                        "Aplicar según edad y cronograma", "7–72 semanas", "Preventivo"),
-                new PlanRow("Tratamiento Respiratorio",
-                        "Síntomas respiratorios y recuperación", "Todos", "Curativo")
-        );
-        tblPlanes.setItems(planes);
-
-        // ------ Medicamentos ------
         colMed.setCellValueFactory(d -> d.getValue().nombreProperty());
         colStock.setCellValueFactory(d -> d.getValue().stockTextoProperty());
         colInv.setCellValueFactory(d -> d.getValue().inventarioProperty());
         colBar.setCellValueFactory(d -> d.getValue().nivelProperty().asObject());
-        colBar.setCellFactory(ProgressBarTableCell.forTableColumn()); // barra verde
+        colBar.setCellFactory(ProgressBarTableCell.forTableColumn());
+        tblMedicamentos.setItems(medicamentosData);
+    }
 
-        ObservableList<MedRow> meds = FXCollections.observableArrayList(
-                new MedRow("Vacuna Newcastle", 25, 0.75, "Ver en Inventario"),
-                new MedRow("Antibiótico Respiratorio", 8, 0.18, "Ver en Inventario"), // bajo
-                new MedRow("Vitamina E+Selenio", 12, 0.50, "Ver en Inventario")
-        );
-        tblMedicamentos.setItems(meds);
+    private void loadFilters() {
+        try {
+            List<String> lotes = new ArrayList<>();
+            lotes.add("Todos");
+            lotes.addAll(SanidadDAO.getLotes());
+            cbGalpon.setItems(FXCollections.observableArrayList(lotes));
+            cbGalpon.getSelectionModel().selectFirst();
 
-        // ------ Filtros (demo) ------
-        cbGalpon.setItems(FXCollections.observableArrayList("Todos", "Galpón 1", "Galpón 2", "Galpón 3"));
-        cbGalpon.getSelectionModel().selectFirst();
-        cbMedicamento.setItems(FXCollections.observableArrayList("Todos", "Vacuna", "Antibiótico", "Vitamina"));
-        cbMedicamento.getSelectionModel().selectFirst();
+            List<String> medicamentos = new ArrayList<>();
+            medicamentos.add("Todos");
+            medicamentos.addAll(SanidadDAO.getMedicamentosNombres());
+            cbMedicamento.setItems(FXCollections.observableArrayList(medicamentos));
+            cbMedicamento.getSelectionModel().selectFirst();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los filtros: " + e.getMessage()).showAndWait();
+        }
         dpDesde.setValue(LocalDate.now().minusDays(30));
         dpHasta.setValue(LocalDate.now());
     }
 
-    /* ================= Acciones ================= */
+    private void refreshData() {
+        try {
+            planesData.setAll(SanidadDAO.getPlanesSanitarios());
+            medicamentosData.setAll(SanidadDAO.getMedicamentosStock());
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los datos de sanidad: " + e.getMessage()).showAndWait();
+        }
+        refreshKpis();
+    }
+
+    private void refreshKpis() {
+        kpiAplicaciones.setText(String.valueOf(planesData.size()));
+        kpiMortalidad.setText("0"); // TODO: Necesita una consulta específica
+        kpiCasosActivos.setText("0"); // TODO: Necesita una consulta específica
+        kpiMedStock.setText(String.valueOf(medicamentosData.size()));
+        long bajos = medicamentosData.stream().filter(m -> m.getNivel() < 0.25).count();
+        kpiMedBajos.setText(bajos + " bajo(s)");
+    }
 
     @FXML
     private void onRegistrarAplicacion() {
-        // defensivo: log si el botón no está inyectado
-        // System.out.println("btnRegistrarAplicacion = " + btnRegistrarAplicacion);
-
-        RegAplicacionController ctrl = ModalUtil.openModal(
-                btnRegistrarAplicacion,
-                "/fxml/sanidad/modal_reg_aplicacion.fxml",
-                "Registrar Aplicación de Medicamento"
-        );
-
-        if (ctrl != null) {
-            AplicacionDTO dto = ctrl.getResult();
-            if (dto != null) {
-                System.out.println("Aplicación guardada: " + dto);
-                // TODO: persistir y refrescar listas/KPIs
+        RegAplicacionController ctrl = ModalUtil.openModal(btnRegistrarAplicacion, "/fxml/sanidad/modal_reg_aplicacion.fxml", "Registrar Aplicación de Medicamento");
+        if (ctrl != null && ctrl.getResult() != null) {
+            try {
+                SanidadDAO.guardarAplicacion(ctrl.getResult());
+                new Alert(Alert.AlertType.INFORMATION, "Aplicación registrada correctamente.").showAndWait();
+                refreshData();
+            } catch (Exception e) {
+                e.printStackTrace();
+                new Alert(Alert.AlertType.ERROR, "No se pudo guardar la aplicación: " + e.getMessage()).showAndWait();
             }
         }
     }
 
     @FXML
     private void onRegistrarEvento() {
-        RegEventoController ctrl = ModalUtil.openModal(
-                btnRegistrarEvento,
-                "/fxml/sanidad/modal_reg_evento.fxml",
-                "Registrar Evento Sanitario"
-        );
-
-        if (ctrl != null) {
+        RegEventoController ctrl = ModalUtil.openModal(btnRegistrarEvento, "/fxml/sanidad/modal_reg_evento.fxml", "Registrar Evento Sanitario");
+        if (ctrl != null && ctrl.getResult() != null) {
             EventoDTO dto = ctrl.getResult();
-            if (dto != null) {
-                System.out.println("Evento guardado: " + dto);
-                // TODO: persistir y refrescar listas/KPIs
+            try {
+                SanidadDAO.guardarEvento(dto);
+                new Alert(Alert.AlertType.INFORMATION, "Evento registrado correctamente.").showAndWait();
+                refreshData();
+            } catch (Exception e) {
+                e.printStackTrace();
+                new Alert(Alert.AlertType.ERROR, "No se pudo guardar el evento: " + e.getMessage()).showAndWait();
             }
         }
     }
 
-    @FXML private void onBuscar() {
-        // TODO: aplicar filtros contra BD
-        System.out.printf("Buscar: q=%s, galpón=%s, med=%s, desde=%s, hasta=%s%n",
-                txtBuscar.getText(), cbGalpon.getValue(), cbMedicamento.getValue(),
-                dpDesde.getValue(), dpHasta.getValue());
-    }
+    @FXML private void onBuscar() { /* TODO */ }
+    @FXML private void onLimpiar() { /* TODO */ }
+    @FXML private void goDashboard() { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
+    @FXML private void goSupplies() { App.goTo("/fxml/suministros.fxml", "SIA Avitech — Suministros"); }
+    @FXML private void goHealth() { /* ya aquí */ }
+    @FXML private void goProduction() { App.goTo("/fxml/produccion.fxml", "SIA Avitech — Producción"); }
+    @FXML private void goReports() { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
+    @FXML private void goAlerts() { App.goTo("/fxml/alertas.fxml", "SIA Avitech — Alertas"); }
+    @FXML private void goAudit() { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
+    @FXML private void goParams() { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
+    @FXML private void goUsers() { App.goTo("/fxml/usuarios.fxml", "SIA Avitech — Usuarios"); }
+    @FXML private void goBackup() { App.goTo("/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
+    @FXML private void onExit() { App.goTo("/fxml/login.fxml", "SIA Avitech — LOGIN"); }
 
-    @FXML private void onLimpiar() {
-        txtBuscar.clear();
-        cbGalpon.getSelectionModel().selectFirst();
-        cbMedicamento.getSelectionModel().selectFirst();
-        dpDesde.setValue(LocalDate.now().minusDays(30));
-        dpHasta.setValue(LocalDate.now());
-        // TODO: recargar tabla completa
-    }
-
-    /* ================= Navegación ================= */
-
-    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
-    @FXML private void goSupplies()   { App.goTo("/fxml/suministros.fxml",     "SIA Avitech — Suministros"); }
-    @FXML private void goHealth()     { /* ya aquí */ }
-    @FXML private void goProduction() { App.goTo("/fxml/produccion.fxml",      "SIA Avitech — Producción"); }
-    @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml",        "SIA Avitech — Reportes"); }
-    @FXML private void goAlerts()     { App.goTo("/fxml/alertas.fxml",         "SIA Avitech — Alertas"); }
-    @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml",       "SIA Avitech — Auditoría"); }
-    @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml",      "SIA Avitech — Parámetros"); }
-    @FXML private void goUsers()      { App.goTo("/fxml/usuarios.fxml",        "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { App.goTo("/fxml/respaldos.fxml",       "SIA Avitech — Respaldos"); }
-    @FXML private void onExit()       { App.goTo("/fxml/login.fxml",           "SIA Avitech — LOGIN"); }
-
-    /* ================= Row models ================= */
 
     public static class PlanRow {
-        private final StringProperty plan = new SimpleStringProperty();
-        private final StringProperty desc = new SimpleStringProperty();
-        private final StringProperty edad = new SimpleStringProperty();
+        private final StringProperty nombreEnfermedad = new SimpleStringProperty();
+        private final StringProperty descripcion = new SimpleStringProperty();
+        private final StringProperty medicamento = new SimpleStringProperty();
         private final StringProperty estado = new SimpleStringProperty();
-        public PlanRow(String p, String d, String e, String s) { plan.set(p); desc.set(d); edad.set(e); estado.set(s); }
-        public StringProperty planProperty()   { return plan; }
-        public StringProperty descProperty()   { return desc; }
-        public StringProperty edadProperty()   { return edad; }
+        public PlanRow(String p, String d, String e, String s) { nombreEnfermedad.set(p); descripcion.set(d); medicamento.set(e); estado.set(s); }
+        public StringProperty nombreEnfermedadProperty() { return nombreEnfermedad; }
+        public StringProperty descripcionProperty() { return descripcion; }
+        public StringProperty medicamentoProperty() { return medicamento; }
         public StringProperty estadoProperty() { return estado; }
     }
 
     public static class MedRow {
         private final StringProperty nombre = new SimpleStringProperty();
         private final IntegerProperty stock = new SimpleIntegerProperty();
-        private final DoubleProperty  nivel = new SimpleDoubleProperty(); // 0..1
+        private final DoubleProperty nivel = new SimpleDoubleProperty();
         private final StringProperty inventario = new SimpleStringProperty();
-        public MedRow(String n, int s, double pct, String inv) { nombre.set(n); stock.set(s); nivel.set(pct); inventario.set(inv); }
+        private final StringProperty presentacion = new SimpleStringProperty();
+        public MedRow(String n, int s, double pct, String inv) { nombre.set(n); stock.set(s); nivel.set(pct); inventario.set(inv); this.presentacion.set("unidades"); }
         public StringProperty nombreProperty() { return nombre; }
-        public StringProperty stockTextoProperty() { return new SimpleStringProperty(String.valueOf(stock.get()) + " frascos"); }
-        public DoubleProperty  nivelProperty()  { return nivel; }
+        public StringProperty stockTextoProperty() { return new SimpleStringProperty(stock.get() + " " + presentacion.get()); }
+        public DoubleProperty nivelProperty() { return nivel; }
+        public double getNivel() { return nivel.get(); }
         public StringProperty inventarioProperty() { return inventario; }
     }
 }
