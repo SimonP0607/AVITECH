@@ -53,6 +53,49 @@ public class SuministrosDAO {
         return resultados;
     }
 
+    public static List<String> getProductos() throws Exception {
+        List<String> resultados = new ArrayList<>();
+        String sql = "SELECT DISTINCT item FROM Suministros ORDER BY item";
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                resultados.add(rs.getString("item"));
+            }
+        }
+        return resultados;
+    }
+
+    public static void addMovimiento(String item, int cantidad, String tipo, String motivo, String responsable) throws Exception {
+        String unidad = getUnidadForItem(item);
+        String sql = "INSERT INTO Suministros (fecha, item, cantidad, unidad, tipo, motivo, responsable) VALUES (NOW(), ?, ?, ?, ?, ?, ?)";
+
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, item);
+            ps.setInt(2, cantidad);
+            ps.setString(3, unidad);
+            ps.setString(4, tipo);
+            ps.setString(5, motivo);
+            ps.setString(6, responsable);
+            ps.executeUpdate();
+        }
+    }
+
+    private static String getUnidadForItem(String item) throws Exception {
+        String sql = "SELECT unidad FROM Suministros WHERE item = ? ORDER BY fecha DESC LIMIT 1";
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, item);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("unidad");
+                }
+            }
+        }
+        return "unidad"; // Valor por defecto si no se encuentra
+    }
+
     public static class Mov {
         public final String fecha, item, cantidad, unidad, tipo, responsable, detalles, stock;
         public final String itemLc, detallesLc, respLc;
