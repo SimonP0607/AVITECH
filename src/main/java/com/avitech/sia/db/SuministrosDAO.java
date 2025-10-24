@@ -33,6 +33,26 @@ public class SuministrosDAO {
         return resultados;
     }
 
+    public static List<InventarioItem> getInventario() throws Exception {
+        List<InventarioItem> resultados = new ArrayList<>();
+        String sql = "SELECT item, unidad, SUM(CASE WHEN tipo = 'Entrada' THEN cantidad ELSE -cantidad END) as stock_actual " +
+                     "FROM Suministros GROUP BY item, unidad ORDER BY item";
+
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                resultados.add(new InventarioItem(
+                        rs.getString("item"),
+                        rs.getInt("stock_actual"),
+                        rs.getString("unidad")
+                ));
+            }
+        }
+        return resultados;
+    }
+
     public static class Mov {
         public final String fecha, item, cantidad, unidad, tipo, responsable, detalles, stock;
         public final String itemLc, detallesLc, respLc;
@@ -59,6 +79,18 @@ public class SuministrosDAO {
                 ld = LocalDate.parse(fecha.substring(0, 10));
             } catch (Exception ignored) {}
             this.localDate = ld;
+        }
+    }
+
+    public static class InventarioItem {
+        public final String producto;
+        public final int stock;
+        public final String unidad;
+
+        public InventarioItem(String producto, int stock, String unidad) {
+            this.producto = producto;
+            this.stock = stock;
+            this.unidad = unidad;
         }
     }
 }

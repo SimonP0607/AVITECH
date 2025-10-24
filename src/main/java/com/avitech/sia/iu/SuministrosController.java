@@ -107,7 +107,7 @@ public class SuministrosController {
     /* ======= Acciones ======= */
     @FXML private void onEntrada()   { /* abrir modal entrada */ }
     @FXML private void onSalida()    { /* abrir modal salida  */ }
-    @FXML private void onVerStock()  { /* ir al inventario    */ }
+    @FXML private void onVerStock()  { App.goTo("/fxml/inventario.fxml", "SIA Avitech — Inventario"); }
     @FXML private void onMoverStock(){ /* flujo mover stock   */ }
     @FXML private void onExportar()  { /* export CSV/XLSX     */ }
 
