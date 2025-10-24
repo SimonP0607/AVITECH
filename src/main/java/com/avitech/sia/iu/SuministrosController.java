@@ -84,6 +84,7 @@ public class SuministrosController {
     private void refreshData() {
         try {
             master.setAll(SuministrosDAO.getAll());
+            System.out.println("SuministrosController.refreshData(): master tiene " + master.size() + " elementos.");
             inventarioActual.setAll(SuministrosDAO.getInventario());
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,10 +115,29 @@ public class SuministrosController {
 
     @FXML
     private void applyFilter() {
-        // ... (código de filtrado sin cambios)
+        final String t = txtSearch.getText().toLowerCase().trim();
+        final String tipo = cbTipo.getSelectionModel().getSelectedItem();
+        final String resp = cbResp.getSelectionModel().getSelectedItem();
+        final LocalDate d1 = dpDesde.getValue();
+        final LocalDate d2 = dpHasta.getValue();
+
+        filtered.setAll(master.filtered(m ->
+                (t.isEmpty() || m.itemLc.contains(t) || m.detallesLc.contains(t) || m.respLc.contains(t)) &&
+                        ("Todos".equals(tipo) || m.tipo.equalsIgnoreCase(tipo)) &&
+                        ("Todos".equals(resp) || m.responsable.equalsIgnoreCase(resp)) &&
+                        (isBetween(m.localDate, d1, d2))
+        ));
+        System.out.println("SuministrosController.applyFilter(): filtered tiene " + filtered.size() + " elementos.");
+
+        tblMovs.setItems(filtered);
+        lblMostrando.setText(filtered.size() + " ítems");
     }
 
-    // ... (resto de la clase sin cambios)
+    private static boolean isBetween(LocalDate f, LocalDate d1, LocalDate d2) {
+        if (f == null) return true;
+        return (d1 == null || !f.isBefore(d1)) && (d2 == null || !f.isAfter(d2));
+    }
+
     @FXML private void onEntrada() { showMovimientoDialog(true); }
     @FXML private void onSalida() { showMovimientoDialog(false); }
 

@@ -25,7 +25,7 @@ public class SuministrosDAO {
                         rs.getDate("fecha").toLocalDate().toString(),
                         rs.getString("item"),
                         String.valueOf(rs.getInt("cantidad")),
-                        rs.getString("unidad"),
+                        rs.getString("unidad"), // <-- Argumento 4 (unidad)
                         rs.getString("tipo"),
                         rs.getString("responsable"),
                         rs.getString("motivo"),
@@ -33,20 +33,21 @@ public class SuministrosDAO {
                 ));
             }
         }
+        System.out.println("SuministrosDAO.getAll(): Recuperados " + allMovementsAsc.size() + " movimientos de la BD.");
 
         Map<String, Integer> itemCurrentStockMap = new HashMap<>();
         for (InventarioItem item : getInventario()) {
-            itemCurrentStockMap.put(item.producto, item.stock);
+            itemCurrentStockMap.put(item.getCompositeKey(), item.stock);
         }
 
         List<Mov> resultsDesc = new ArrayList<>();
         for (int i = allMovementsAsc.size() - 1; i >= 0; i--) {
             Mov currentMov = allMovementsAsc.get(i);
-            String item = currentMov.item;
+            String compositeKey = currentMov.getCompositeKey(); // Usar la clave compuesta
             int quantity = Integer.parseInt(currentMov.cantidad);
             String type = currentMov.tipo;
 
-            int stockAfterThisMovement = itemCurrentStockMap.getOrDefault(item, 0);
+            int stockAfterThisMovement = itemCurrentStockMap.getOrDefault(compositeKey, 0);
 
             resultsDesc.add(new Mov(
                     currentMov.fecha,
@@ -60,9 +61,9 @@ public class SuministrosDAO {
             ));
 
             if ("Entrada".equalsIgnoreCase(type)) {
-                itemCurrentStockMap.put(item, stockAfterThisMovement - quantity);
+                itemCurrentStockMap.put(compositeKey, stockAfterThisMovement - quantity);
             } else if ("Salida".equalsIgnoreCase(type)) {
-                itemCurrentStockMap.put(item, stockAfterThisMovement + quantity);
+                itemCurrentStockMap.put(compositeKey, stockAfterThisMovement + quantity);
             }
         }
 
@@ -155,7 +156,7 @@ public class SuministrosDAO {
 
     public static class Mov {
         public final String fecha, item, cantidad, unidad, tipo, responsable, detalles, stock;
-        public final String itemLc, detallesLc, respLc;
+        public final String itemLc, detallesLc, respLc, unidadLc;
         public final LocalDate localDate;
 
         public Mov(String fecha, String item, String cantidad, String unidad, String tipo,
@@ -163,7 +164,7 @@ public class SuministrosDAO {
             this.fecha = fecha;
             this.item = item;
             this.cantidad = cantidad;
-            this.unidad = unidad;
+            this.unidad = unidad; // Usar movUnidad para la unidad del movimiento
             this.tipo = tipo;
             this.responsable = responsable;
             this.detalles = detalles;
@@ -172,12 +173,17 @@ public class SuministrosDAO {
             this.itemLc = item != null ? item.toLowerCase() : "";
             this.detallesLc = detalles != null ? detalles.toLowerCase() : "";
             this.respLc = responsable != null ? responsable.toLowerCase() : "";
+            this.unidadLc = unidad != null ? unidad.toLowerCase() : "";
 
             LocalDate ld = null;
             try {
                 ld = LocalDate.parse(fecha.substring(0, 10));
             } catch (Exception ignored) {}
             this.localDate = ld;
+        }
+
+        public String getCompositeKey() {
+            return (item != null ? item : "") + "::" + (unidad != null ? unidad : "");
         }
     }
 
@@ -190,6 +196,10 @@ public class SuministrosDAO {
             this.producto = producto;
             this.stock = stock;
             this.unidad = unidad;
+        }
+
+        public String getCompositeKey() {
+            return (producto != null ? producto : "") + "::" + (unidad != null ? unidad : "");
         }
     }
 }
