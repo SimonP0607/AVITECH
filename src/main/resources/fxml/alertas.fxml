@@ -119,7 +119,7 @@
                                 <TextField fx:id="txtSearch" promptText="Buscar por artículo, categoría o ubicación…" HBox.hgrow="ALWAYS"/>
                                 <ComboBox fx:id="cbCategoria" promptText="Todas las categorías" prefWidth="180"/>
                                 <ComboBox fx:id="cbCriticidad" promptText="Todas las criticidad" prefWidth="180"/>
-                                <ComboBox fx:id="cbUbicacion" promptText="Todas las ubicaciones" prefWidth="180"/>
+                                <!-- Eliminado: <ComboBox fx:id="cbUbicacion" promptText="Todas las ubicaciones" prefWidth="180"/> -->
                                 <Button text="Aplicar" onAction="#onAplicarFiltros" styleClass="primary"/>
                                 <Button text="Limpiar" onAction="#onLimpiarFiltros" styleClass="ghostBtn"/>
                             </children>
@@ -145,7 +145,6 @@
                                         <TableColumn fx:id="colStockMin"    text="Stock Mínimo" prefWidth="110"/>
                                         <TableColumn fx:id="colPorcentaje"  text="Stock (%)"      prefWidth="90"/>
                                         <TableColumn fx:id="colDias"        text="Días Restantes" prefWidth="120"/>
-                                        <TableColumn fx:id="colUbicacion"   text="Ubicación"    prefWidth="160"/>
                                         <TableColumn fx:id="colAccion"      text="Acción"       prefWidth="100"/>
                                     </columns>
                                     <placeholder>

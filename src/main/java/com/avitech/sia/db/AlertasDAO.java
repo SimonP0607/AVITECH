@@ -1,8 +1,11 @@
-    package com.avitech.sia.db;
+package com.avitech.sia.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,15 +13,17 @@ public class AlertasDAO {
 
     public static List<ItemAlerta> getAll() throws Exception {
         List<ItemAlerta> resultados = new ArrayList<>();
-        String sql = "SELECT a.tipo, a.descripcion, a.categoria, a.fecha, a.estado, " +
-                     "m.stock, m.stock_minimo, m.nombre AS item_nombre " +
-                     "FROM Alertas a " +
-                     "LEFT JOIN Medicamentos m ON a.id_item = m.Id_Medicamento " +
-                     "WHERE a.estado = 'Activa' " +
-                     "ORDER BY a.fecha DESC";
+
+        // --- Query para Alertas de Medicamentos (existente) ---
+        String sqlMedicamentos = "SELECT a.tipo, a.descripcion, a.categoria, a.fecha, a.estado, " +
+                                 "m.stock, m.stock_minimo, m.nombre AS item_nombre " +
+                                 "FROM Alertas a " +
+                                 "LEFT JOIN Medicamentos m ON a.id_item = m.Id_Medicamento " +
+                                 "WHERE a.estado = 'Activa' " +
+                                 "ORDER BY a.fecha DESC";
 
         try (Connection cn = DB.get();
-             PreparedStatement ps = cn.prepareStatement(sql);
+             PreparedStatement ps = cn.prepareStatement(sqlMedicamentos);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -34,8 +39,13 @@ public class AlertasDAO {
                         porcentaje = String.format("%.1f%%", pct);
                     }
                 }
-                String diasRestantes = "N/A"; // Placeholder, podría calcular días desde fecha si es relevante
-                String ubicacion = "N/A"; // Placeholder, no hay ubicación en las tablas actuales
+
+                String diasRestantes = "N/A";
+                if (rs.getDate("fecha") != null) {
+                    LocalDate fechaAlerta = rs.getDate("fecha").toLocalDate();
+                    long daysBetween = ChronoUnit.DAYS.between(fechaAlerta, LocalDate.now());
+                    diasRestantes = String.valueOf(daysBetween);
+                }
 
                 resultados.add(new ItemAlerta(
                         articulo,
@@ -45,11 +55,58 @@ public class AlertasDAO {
                         stockMinimo,
                         porcentaje,
                         diasRestantes,
-                        ubicacion,
                         rs.getString("tipo")
                 ));
             }
         }
+
+        // --- Query para Alertas de Suministros ---
+        String sqlSuministros = "SELECT s.item, s.unidad, " +
+                                "SUM(CASE WHEN s.tipo = 'Entrada' THEN s.cantidad ELSE -s.cantidad END) as current_stock, " +
+                                "MAX(s.stock_minimo) as min_stock_threshold " + // Usamos MAX para el umbral mínimo
+                                "FROM Suministros s " +
+                                "WHERE s.item NOT IN (SELECT nombre FROM Medicamentos) " + // Excluir ítems que son medicamentos
+                                "GROUP BY s.item, s.unidad " +
+                                "HAVING current_stock < MAX(s.stock_minimo)"; // Filtrar por stock bajo
+
+        try (Connection cn = DB.get();
+             PreparedStatement ps = cn.prepareStatement(sqlSuministros);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String itemNombre = rs.getString("item");
+                String unidad = rs.getString("unidad");
+                int currentStock = rs.getInt("current_stock");
+                int minStockThreshold = rs.getInt("min_stock_threshold");
+
+                String stockActualStr = String.valueOf(currentStock);
+                String stockMinimoStr = String.valueOf(minStockThreshold);
+                String porcentajeStr = "N/A";
+                if (minStockThreshold > 0) {
+                    double pct = (double) currentStock / minStockThreshold * 100;
+                    porcentajeStr = String.format("%.1f%%", pct);
+                }
+
+                // Para suministros, los días restantes se establecen en 0 (alerta actual)
+                String diasRestantesStr = "0";
+
+                // Categoría y tipo por defecto para alertas de suministro
+                String categoria = "Suministro";
+                String tipo = "Bajo";
+
+                resultados.add(new ItemAlerta(
+                        itemNombre + " (" + unidad + ")", // Nombre del artículo con unidad
+                        "Stock bajo para " + itemNombre + " (" + unidad + ")", // Descripción
+                        categoria,
+                        stockActualStr,
+                        stockMinimoStr,
+                        porcentajeStr,
+                        diasRestantesStr,
+                        tipo
+                ));
+            }
+        }
+
         return resultados;
     }
 
@@ -61,11 +118,10 @@ public class AlertasDAO {
         private String stockMinimo;
         private String porcentaje;
         private String diasRestantes;
-        private String ubicacion;
         private String tipo;
 
         public ItemAlerta(String articulo, String descripcion, String categoria, String stockActual, String stockMinimo,
-                          String porcentaje, String diasRestantes, String ubicacion, String tipo) {
+                          String porcentaje, String diasRestantes, String tipo) {
             this.articulo = articulo;
             this.descripcion = descripcion;
             this.categoria = categoria;
@@ -73,19 +129,17 @@ public class AlertasDAO {
             this.stockMinimo = stockMinimo;
             this.porcentaje = porcentaje;
             this.diasRestantes = diasRestantes;
-            this.ubicacion = ubicacion;
             this.tipo = tipo;
         }
 
         // Getters para compatibilidad con PropertyValueFactory de JavaFX
-        public String getArticulo() { return articulo; } // Mapeo a la columna 'Artículo'
+        public String getArticulo() { return articulo; }
         public String getDescripcion() { return descripcion; }
         public String getCategoria() { return categoria; }
         public String getStockActual() { return stockActual; }
         public String getStockMinimo() { return stockMinimo; }
         public String getPorcentaje() { return porcentaje; }
         public String getDiasRestantes() { return diasRestantes; }
-        public String getUbicacion() { return ubicacion; }
         public String getTipo() { return tipo; }
     }
 }

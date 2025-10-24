@@ -45,7 +45,7 @@ public class AlertasController {
     @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colStockMin;
     @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colPorcentaje;
     @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colDias;
-    @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colUbicacion;
+    // Eliminada: @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colUbicacion;
     @FXML private TableColumn<AlertasDAO.ItemAlerta, String> colAccion;
 
     @FXML private Label lblCantidadTabla;
@@ -76,8 +76,8 @@ public class AlertasController {
         colStockActual.setCellValueFactory(new PropertyValueFactory<>("stockActual")); // Muestra "N/A"
         colStockMin.setCellValueFactory(new PropertyValueFactory<>("stockMinimo")); // Muestra "N/A"
         colPorcentaje.setCellValueFactory(new PropertyValueFactory<>("porcentaje")); // Muestra "N/A"
-        colDias.setCellValueFactory(new PropertyValueFactory<>("diasRestantes")); // Muestra "N/A"
-        colUbicacion.setCellValueFactory(new PropertyValueFactory<>("ubicacion")); // Muestra "N/A"
+        colDias.setCellValueFactory(new PropertyValueFactory<>("diasRestantes"));
+        // Eliminada: colUbicacion.setCellValueFactory(new PropertyValueFactory<>("ubicacion")); // Muestra "N/A"
 
         // Columna de acción con botón "Ir al ítem"
         colAccion.setCellValueFactory(param -> new SimpleStringProperty("Ir al ítem"));
@@ -166,8 +166,8 @@ public class AlertasController {
         filtered.setAll(master.filtered(it ->
                 (text.isEmpty() || it.getDescripcion().toLowerCase().contains(text) || it.getCategoria().toLowerCase().contains(text)) &&
                         (cat.equals("Todas") || it.getCategoria().equalsIgnoreCase(cat)) &&
-                        (cri.equals("Todas") || it.getTipo().equalsIgnoreCase(cri)) &&
-                        (ubi.equals("Todas") /*|| it.getUbicacion().equalsIgnoreCase(ubi)*/) // Ubicación no está en la tabla Alertas
+                        (cri.equals("Todas") || it.getTipo().equalsIgnoreCase(cri))
+                        // Eliminada: && (ubi.equals("Todas") /*|| it.getUbicacion().equalsIgnoreCase(ubi)*/) // Ubicación ya no está en la tabla Alertas
         ));
 
         tblAlertas.setItems(filtered);
