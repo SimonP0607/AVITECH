@@ -61,8 +61,8 @@ public class AlertasController extends BaseController implements UsesAlertasData
     @FXML private Label lblResCritico, lblResBajo, lblResAdvertencia;
     @FXML private Label lblBanner;
 
-    // DataSource inyectable
-    private AlertasDataSource ds;
+    // DataSource inyectable (usa EmptyAlertasDataSource por defecto)
+    private AlertasDataSource ds = new EmptyAlertasDataSource();
     public void setAlertasDataSource(AlertasDataSource ds) { this.ds = ds; }
     @Override public AlertasDataSource alertasDs() { return ds; }
 
@@ -139,7 +139,7 @@ public class AlertasController extends BaseController implements UsesAlertasData
     @FXML private void goSupplies()   { App.goTo("/fxml/suministros/suministros.fxml", "SIA Avitech — Suministros"); }
     @FXML private void goHealth()     { App.goTo("/fxml/sanidad/sanidad.fxml", "SIA Avitech — Sanidad"); }
     @FXML private void goProduction() { App.goTo("/fxml/produccion/produccion.fxml", "SIA Avitech — Producción"); }
-    @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
+    @FXML private void goReports()    { App.goTo("/fxml/reportes/reportes.fxml", "SIA Avitech — Reportes"); }
     @FXML private void goAlerts()     { App.goTo("/fxml/alertas/alertas.fxml", "SIA Avitech — Alertas"); }
     @FXML private void goAudit()      { App.goTo("/fxml/auditoria/auditoria.fxml", "SIA Avitech — Auditoría"); }
     @FXML private void goParams()     { App.goTo("/fxml/parametros.fxml", "SIA Avitech — Parámetros"); }
