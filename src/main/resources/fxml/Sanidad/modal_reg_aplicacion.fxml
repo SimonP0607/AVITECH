@@ -35,7 +35,7 @@
                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
 
                 <Label text="Vía de Aplicación *" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="input-label"/>
-                <ComboBox fx:id="cbVia" promptText="Seleccionar vía"
+                <ComboBox fx:id="cbViaAplicacion" promptText="Seleccionar vía"
                           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
 
                 <Label text="Observaciones" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="input-label"/>
@@ -43,11 +43,11 @@
 
                 <!-- col 2 -->
                 <Label text="Lote/Galpón *" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="input-label"/>
-                <ComboBox fx:id="cbLote" promptText="Seleccionar lote"
+                <ComboBox fx:id="cbLoteGalpon" promptText="Seleccionar lote"
                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
                 <Label text="Dosis *" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="input-label"/>
-                <TextField fx:id="tfDosis" promptText="Ej: 0.3ml/ave, 1ml/L agua"
+                <TextField fx:id="tfDosis" promptText="Ej: 10 (unidades del medicamento)"
                            GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
                 <Label text="Responsable *" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="input-label"/>

@@ -1,5 +1,7 @@
 package com.avitech.sia.iu.sanidad;
 
+import com.avitech.sia.db.SanidadDAO;
+import com.avitech.sia.db.UsuarioDAO;
 import com.avitech.sia.iu.sanidad.dto.AplicacionDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -10,23 +12,28 @@ import java.time.LocalDate;
 public class RegAplicacionController {
 
     @FXML private DatePicker dpFecha;
-    @FXML private ComboBox<String> cbLote;
+    @FXML private ComboBox<String> cbLoteGalpon; // Renombrado para coincidir con DTO
     @FXML private ComboBox<String> cbMedicamento;
     @FXML private TextField tfDosis;
-    @FXML private ComboBox<String> cbVia;
+    @FXML private ComboBox<String> cbViaAplicacion; // Renombrado para coincidir con DTO
     @FXML private ComboBox<String> cbResponsable;
     @FXML private TextArea taObs;
 
-    private AplicacionDTO result;  // output
+    private AplicacionDTO result;
 
     @FXML
     public void initialize() {
-        // demo: valores de muestra; en real, cargar desde BD vía DAO/Service
         dpFecha.setValue(LocalDate.now());
-        cbLote.getItems().addAll("Galpón 1", "Galpón 2", "Galpón 3");
-        cbMedicamento.getItems().addAll("Vacuna Newcastle", "Vitamina E+Selenio", "Antibiótico Respiratorio");
-        cbVia.getItems().addAll("Oral", "Agua", "Inyectable", "Tópica");
-        cbResponsable.getItems().addAll("Juan Pérez", "Ana López", "Carlos Rivera");
+        cbViaAplicacion.getItems().addAll("Oral", "Agua", "Inyectable", "Tópica");
+
+        try {
+            cbLoteGalpon.getItems().setAll(SanidadDAO.getLotes());
+            cbMedicamento.getItems().setAll(SanidadDAO.getMedicamentosNombres());
+            cbResponsable.getItems().setAll(UsuarioDAO.getAllUsernames());
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los datos para el formulario: " + e.getMessage()).showAndWait();
+        }
     }
 
     public AplicacionDTO getResult() { return result; }
@@ -41,12 +48,13 @@ public class RegAplicacionController {
     private void onSave() {
         if (!valid()) return;
 
+        // Corregida la creación del DTO para que coincida con los campos del record
         result = new AplicacionDTO(
                 dpFecha.getValue(),
-                cbLote.getValue(),
+                cbLoteGalpon.getValue(),
                 cbMedicamento.getValue(),
                 tfDosis.getText().trim(),
-                cbVia.getValue(),
+                cbViaAplicacion.getValue(),
                 cbResponsable.getValue(),
                 taObs.getText().trim()
         );
@@ -56,12 +64,11 @@ public class RegAplicacionController {
 
     private boolean valid() {
         StringBuilder sb = new StringBuilder();
-
         if (dpFecha.getValue() == null) sb.append("• Fecha.\n");
-        if (isEmpty(cbLote)) sb.append("• Lote/Galpón.\n");
+        if (isEmpty(cbLoteGalpon)) sb.append("• Lote/Galpón.\n");
         if (isEmpty(cbMedicamento)) sb.append("• Medicamento.\n");
         if (tfDosis.getText() == null || tfDosis.getText().isBlank()) sb.append("• Dosis.\n");
-        if (isEmpty(cbVia)) sb.append("• Vía de aplicación.\n");
+        if (isEmpty(cbViaAplicacion)) sb.append("• Vía de aplicación.\n");
         if (isEmpty(cbResponsable)) sb.append("• Responsable.\n");
 
         if (sb.length() > 0) {

@@ -5,9 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class App extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
     private static Stage primaryStage;
 
     public static Stage PrimaryStage() {
@@ -16,6 +19,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        logger.info("Iniciando aplicación SIA Avitech");
+
         // Cargar fuentes (asegúrate de tenerlas en resources/fonts/)
         Font.loadFont(getClass().getResourceAsStream("/fonts/Poppins-Regular.ttf"), 12);
         Font.loadFont(getClass().getResourceAsStream("/fonts/Poppins-SemiBold.ttf"), 12);
@@ -29,9 +34,12 @@ public class App extends Application {
         scene.getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
 
         stage.setTitle("SIA Avitech — Inicio de sesión");
-        stage.setMaximized(true);
+        stage.setWidth(1920);
+        stage.setHeight(1080);
         stage.setScene(scene);
         stage.show();
+
+        logger.info("Aplicación iniciada correctamente");
     }
 
     /**
@@ -42,29 +50,18 @@ public class App extends Application {
      */
     public static void goTo(String fxmlPath, String title) {
         try {
-            boolean wasMaximized = primaryStage.isMaximized();
-            double width = primaryStage.getWidth();
-            double height = primaryStage.getHeight();
-
             FXMLLoader loader = new FXMLLoader(App.class.getResource(fxmlPath));
             Scene scene = new Scene(loader.load());
             scene.getStylesheets().add(App.class.getResource("/css/theme.css").toExternalForm());
 
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
-            if (wasMaximized) {
-                primaryStage.setMaximized(true);
-            } else {
-                if (!Double.isNaN(width) && width > 0) {
-                    primaryStage.setWidth(width);
-                }
-                if (!Double.isNaN(height) && height > 0) {
-                    primaryStage.setHeight(height);
-                }
-            }
+            primaryStage.setWidth(1920);
+            primaryStage.setHeight(1080);
             primaryStage.show();
+            logger.info("Navegando a: {}", fxmlPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error al cambiar de escena: {}", fxmlPath, e);
             throw new RuntimeException("Error al cambiar de escena: " + fxmlPath, e);
         }
     }

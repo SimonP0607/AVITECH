@@ -1,9 +1,9 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.db.UsuarioDAO;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -35,17 +35,17 @@ public class UsuariosController {
     @FXML private Label lblConHoy;
 
     // Tabla
-    @FXML private TableView<UserRow> tblUsuarios;
-    @FXML private TableColumn<UserRow, String> colNombre;
-    @FXML private TableColumn<UserRow, String> colUsuario;
-    @FXML private TableColumn<UserRow, String> colRol;
-    @FXML private TableColumn<UserRow, String> colEstado;
-    @FXML private TableColumn<UserRow, String> colUltimoAcc;
-    @FXML private TableColumn<UserRow, HBox>   colAcciones;
+    @FXML private TableView<UsuarioDAO.Usuario> tblUsuarios;
+    @FXML private TableColumn<UsuarioDAO.Usuario, String> colNombre;
+    @FXML private TableColumn<UsuarioDAO.Usuario, String> colUsuario;
+    @FXML private TableColumn<UsuarioDAO.Usuario, String> colRol;
+    @FXML private TableColumn<UsuarioDAO.Usuario, String> colEstado;
+    @FXML private TableColumn<UsuarioDAO.Usuario, String> colUltimoAcc;
+    @FXML private TableColumn<UsuarioDAO.Usuario, HBox>   colAcciones;
 
     // Datos
-    private final ObservableList<UserRow> baseData = FXCollections.observableArrayList();
-    private FilteredList<UserRow> filtered;
+    private final ObservableList<UsuarioDAO.Usuario> baseData = FXCollections.observableArrayList();
+    private FilteredList<UsuarioDAO.Usuario> filtered;
 
     private final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -62,16 +62,16 @@ public class UsuariosController {
         cbEstado.getSelectionModel().selectFirst();
 
         // Columnas
-        colNombre.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().nombre()));
-        colUsuario.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().usuario()));
-        colRol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().rol()));
-        colEstado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().estado()));
-        colUltimoAcc.setCellValueFactory(d -> new SimpleStringProperty(DF.format(d.getValue().ultimoAcceso())));
+        colNombre.setCellValueFactory(d -> new SimpleObjectProperty<>(d.getValue().getNombre()));
+        colUsuario.setCellValueFactory(d -> new SimpleObjectProperty<>(d.getValue().getUsuario()));
+        colRol.setCellValueFactory(d -> new SimpleObjectProperty<>(d.getValue().getRol()));
+        colEstado.setCellValueFactory(d -> new SimpleObjectProperty<>(d.getValue().getEstado()));
+        colUltimoAcc.setCellValueFactory(d -> new SimpleObjectProperty<>(d.getValue().getUltimoAcceso() != null ? DF.format(d.getValue().getUltimoAcceso().toLocalDateTime()) : "N/A"));
 
         colAcciones.setCellValueFactory(d -> new SimpleObjectProperty<>(buildActions(d.getValue())));
 
-        // Datos demo (reemplazar cuando conectes BD)
-        seedDemo();
+        // Cargar datos
+        loadUserData();
 
         // Filtrado
         filtered = new FilteredList<>(baseData, r -> true);
@@ -84,28 +84,26 @@ public class UsuariosController {
         // KPIs atados
         lblTotal.textProperty().bind(Bindings.size(filtered).asString());
         lblActivos.textProperty().bind(Bindings.createStringBinding(
-                () -> String.valueOf(filtered.stream().filter(u -> "Activo".equals(u.estado())).count()),
+                () -> String.valueOf(filtered.stream().filter(u -> "Activo".equals(u.getEstado())).count()),
                 filtered));
         lblAdmins.textProperty().bind(Bindings.createStringBinding(
-                () -> String.valueOf(filtered.stream().filter(u -> "Administrador".equals(u.rol())).count()),
+                () -> String.valueOf(filtered.stream().filter(u -> "Administrador".equals(u.getRol())).count()),
                 filtered));
         // Conectados hoy (demo: usuarios con último acceso del día actual)
         lblConHoy.textProperty().bind(Bindings.createStringBinding(
-                () -> String.valueOf(filtered.stream().filter(u -> u.ultimoAcceso().toLocalDate().equals(LocalDateTime.now().toLocalDate())).count()),
+                () -> String.valueOf(filtered.stream().filter(u -> u.getUltimoAcceso() != null && u.getUltimoAcceso().toLocalDateTime().toLocalDate().equals(LocalDateTime.now().toLocalDate())).count()),
                 filtered));
 
         // CTA nuevo
         btnNuevo.setOnAction(e -> onNuevoUsuario());
     }
 
-    private void seedDemo() {
-        baseData.setAll(
-                new UserRow("María González",     "@mgonzalez", "Administrador", "Activo",   LocalDateTime.now().withHour(20).withMinute(42)),
-                new UserRow("Carlos Pérez",        "@cperez",     "Supervisor",    "Activo",   LocalDateTime.now().withHour(15).withMinute(15)),
-                new UserRow("Ana Rodríguez",       "@arodriguez", "Operador",      "Activo",   LocalDateTime.now().withHour(8).withMinute(15)),
-                new UserRow("Dr. Luis Morales",    "@lmorales",   "Supervisor",    "Activo",   LocalDateTime.now().minusDays(1).withHour(10).withMinute(25)),
-                new UserRow("Elena Vargas",        "@evargas",    "Operador",      "Inactivo", LocalDateTime.now().minusDays(5).withHour(11).withMinute(30))
-        );
+    private void loadUserData() {
+        try {
+            baseData.setAll(UsuarioDAO.getAll());
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los usuarios: " + e.getMessage()).showAndWait();
+        }
     }
 
     private void applyFilter() {
@@ -115,15 +113,15 @@ public class UsuariosController {
 
         filtered.setPredicate(u -> {
             boolean qOk = q.isEmpty()
-                    || u.nombre().toLowerCase().contains(q)
-                    || u.usuario().toLowerCase().contains(q);
-            boolean rolOk = rol == null || rol.equals("Todos los roles") || Objects.equals(rol, u.rol());
-            boolean estOk = est == null || est.equals("Todos los estados") || Objects.equals(est, u.estado());
+                    || u.getNombre().toLowerCase().contains(q)
+                    || u.getUsuario().toLowerCase().contains(q);
+            boolean rolOk = rol == null || rol.equals("Todos los roles") || Objects.equals(rol, u.getRol());
+            boolean estOk = est == null || est.equals("Todos los estados") || Objects.equals(est, u.getEstado());
             return qOk && rolOk && estOk;
         });
     }
 
-    private HBox buildActions(UserRow row) {
+    private HBox buildActions(UsuarioDAO.Usuario row) {
         Button btnEdit = new Button("✏");
         Button btnPwd  = new Button("🔑");
         Button btnDel  = new Button("🗑");
@@ -132,17 +130,36 @@ public class UsuariosController {
         btnPwd.getStyleClass().add("ghostBtn");
         btnDel.getStyleClass().add("ghostBtn");
 
-        btnEdit.setOnAction(e -> System.out.println("Editar: " + row.nombre()));
-        btnPwd.setOnAction(e -> System.out.println("Credenciales: " + row.nombre()));
-        btnDel.setOnAction(e -> System.out.println("Eliminar: " + row.nombre()));
+        btnEdit.setOnAction(e -> onEditUsuario(row));
+        btnPwd.setOnAction(e -> System.out.println("Credenciales: " + row.getNombre()));
+        btnDel.setOnAction(e -> onDeleteUsuario(row));
 
         HBox box = new HBox(6, btnEdit, btnPwd, btnDel);
         return box;
     }
 
     private void onNuevoUsuario() {
-        // Base: por ahora log. Luego podrás abrir tu modal de creación.
+        // TODO: Abrir modal de creación de usuario
         System.out.println("Nuevo Usuario… (abrir modal)");
+    }
+
+    private void onEditUsuario(UsuarioDAO.Usuario usuario) {
+        // TODO: Abrir modal de edición de usuario
+        System.out.println("Editar: " + usuario.getNombre());
+    }
+
+    private void onDeleteUsuario(UsuarioDAO.Usuario usuario) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "¿Estás seguro de que quieres eliminar a " + usuario.getNombre() + "?", ButtonType.YES, ButtonType.NO);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                try {
+                    UsuarioDAO.eliminar(usuario.getId());
+                    loadUserData();
+                } catch (Exception e) {
+                    new Alert(Alert.AlertType.ERROR, "No se pudo eliminar el usuario: " + e.getMessage()).showAndWait();
+                }
+            }
+        });
     }
 
     /* ================== Navegación ================== */
@@ -159,11 +176,4 @@ public class UsuariosController {
     @FXML private void onExit() {
         App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión");
     }
-
-    /* ===== Modelo de fila ===== */
-    public record UserRow(String nombre,
-                          String usuario,
-                          String rol,
-                          String estado,
-                          LocalDateTime ultimoAcceso) {}
 }

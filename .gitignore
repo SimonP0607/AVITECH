@@ -44,3 +44,5 @@ bin/
 
 # Archivos de configuración local
 src/main/resources/app.properties
+.idea/dataSources.local.xml
+.idea/dataSources.local.xml

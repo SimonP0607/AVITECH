@@ -20,8 +20,8 @@ public class ParametrosController {
         lblHeader.setText("Administrador");
         lblUserInfo.setText("Administrador");
 
-        // vista por defecto
-        show("/fxml/parametros_unidades.fxml");
+        // vista por defecto (ruta corregida)
+        show("/fxml/Parametros/parametros_unidades.fxml");
     }
 
     // Segmentos

@@ -1,39 +1,39 @@
 package com.avitech.sia.iu;
 
 import com.avitech.sia.App;
+import com.avitech.sia.db.SuministrosDAO;
+import com.avitech.sia.db.UsuarioDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-/** Controlador base de Suministros: navegación lista, filtros dummy y tabla. */
 public class SuministrosController {
 
-    /* topbar / sidebar */
-    @FXML private Label lblSystemStatus;
-    @FXML private Label lblHeader;
-    @FXML private Label lblUserInfo;
-
-    /* KPIs */
+    @FXML private Label lblSystemStatus, lblHeader, lblUserInfo;
     @FXML private Label kpiMovHoy, kpiActivos, kpiStockBajo, kpiValor;
-
-    /* filtros */
     @FXML private TextField txtSearch;
     @FXML private ComboBox<String> cbTipo, cbResp;
     @FXML private DatePicker dpDesde, dpHasta;
     @FXML private Label lblMostrando;
+    @FXML private TableView<SuministrosDAO.Mov> tblMovs;
+    @FXML private TableColumn<SuministrosDAO.Mov, String> colFecha, colItem, colCant, colUnidad, colTipo, colResp, colDet, colStock, colAccion;
 
-    /* tabla */
-    @FXML private TableView<Mov> tblMovs;
-    @FXML private TableColumn<Mov, String> colFecha, colItem, colCant, colUnidad, colTipo, colResp, colDet, colStock, colAccion;
-
-    private final ObservableList<Mov> master = FXCollections.observableArrayList();
-    private final ObservableList<Mov> filtered = FXCollections.observableArrayList();
+    private final ObservableList<SuministrosDAO.Mov> master = FXCollections.observableArrayList();
+    private final ObservableList<SuministrosDAO.InventarioItem> inventarioActual = FXCollections.observableArrayList();
+    private final ObservableList<SuministrosDAO.Mov> filtered = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -41,72 +41,83 @@ public class SuministrosController {
         lblHeader.setText("Administrador");
         lblUserInfo.setText("Administrador");
 
-        /* combos / fechas */
+        // Configurar combos y fechas
         cbTipo.setItems(FXCollections.observableArrayList("Todos", "Entrada", "Salida"));
-        cbResp.setItems(FXCollections.observableArrayList("Todos", "María García", "Juan Pérez", "Carlos Ruiz", "Luis Torres"));
         cbTipo.getSelectionModel().selectFirst();
+        try {
+            var usuarios = new ArrayList<String>();
+            usuarios.add("Todos");
+            usuarios.addAll(UsuarioDAO.getAllUsernames());
+            cbResp.setItems(FXCollections.observableArrayList(usuarios));
+        } catch (Exception e) {
+            e.printStackTrace();
+            cbResp.setItems(FXCollections.observableArrayList("Todos"));
+        }
         cbResp.getSelectionModel().selectFirst();
         dpDesde.setValue(LocalDate.now().minusDays(7));
         dpHasta.setValue(LocalDate.now());
 
-        /* columnas */
-        colFecha.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().fecha));
-        colItem.setCellValueFactory(c  -> new SimpleStringProperty(c.getValue().item));
-        colCant.setCellValueFactory(c  -> new SimpleStringProperty(c.getValue().cantidad));
-        colUnidad.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().unidad));
-        colTipo.setCellValueFactory(c  -> new SimpleStringProperty(c.getValue().tipo));
-        colResp.setCellValueFactory(c  -> new SimpleStringProperty(c.getValue().responsable));
-        colDet.setCellValueFactory(c   -> new SimpleStringProperty(c.getValue().detalles));
-        colStock.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stock));
+        setupTableColumns();
+        refreshData();
+    }
 
-        /* botón en columna Acciones */
-        colAccion.setCellValueFactory(c -> new SimpleStringProperty("ver"));
+    private void setupTableColumns() {
+        colFecha.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().fecha));
+        colItem.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().item));
+        colCant.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().cantidad));
+        colUnidad.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().unidad));
+        colTipo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().tipo));
+        colResp.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().responsable));
+        colDet.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().detalles));
+        colStock.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stock));
         colAccion.setCellFactory(col -> new TableCell<>() {
             private final Hyperlink link = new Hyperlink("Ver ítem");
             { link.setOnAction(e -> onVerItem(getTableView().getItems().get(getIndex()))); }
             @Override protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
                 setGraphic(empty ? null : link);
-                setText(null);
             }
         });
-
-        seed();       // datos de ejemplo
-        applyFilter();// primer filtrado
-        refreshKpis();// KPIs
+        tblMovs.setItems(filtered);
     }
 
-    /* ======= Navegación ======= */
-    @FXML private void goDashboard()  { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
-    @FXML private void goSupplies()   { /* ya estás aquí */ }
-    @FXML private void goHealth()     { App.goTo("/fxml/sanidad.fxml", "SIA Avitech — Sanidad"); }
-    @FXML private void goProduction() { App.goTo("/fxml/produccion.fxml", "SIA Avitech — Producción"); }
-    @FXML private void goReports()    { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
-    @FXML private void goAlerts()     { App.goTo("/fxml/alertas.fxml", "SIA Avitech — Alertas"); }
-    @FXML private void goAudit()      { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
-    @FXML private void goParams()     { /* pendiente */ }
-    @FXML private void goUsers()      { App.goTo("/fxml/usuarios.fxml", "SIA Avitech — Usuarios"); }
-    @FXML private void goBackup()     { /* pendiente */ }
-    @FXML private void onExit()       { App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión"); }
-
-    /* ======= Acciones ======= */
-    @FXML private void onEntrada()   { /* abrir modal entrada */ }
-    @FXML private void onSalida()    { /* abrir modal salida  */ }
-    @FXML private void onVerStock()  { /* ir al inventario    */ }
-    @FXML private void onMoverStock(){ /* flujo mover stock   */ }
-    @FXML private void onExportar()  { /* export CSV/XLSX     */ }
-
-    private void onVerItem(Mov m) {
-        // En real: abrir detalle del ítem (o navegar a inventario con el ID)
-        new Alert(Alert.AlertType.INFORMATION, "Ítem: " + m.item).showAndWait();
+    private void refreshData() {
+        try {
+            master.setAll(SuministrosDAO.getAll());
+            System.out.println("SuministrosController.refreshData(): master tiene " + master.size() + " elementos.");
+            inventarioActual.setAll(SuministrosDAO.getInventario());
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "No se pudieron cargar los datos de suministros: " + e.getMessage()).showAndWait();
+        }
+        applyFilter();
+        refreshKpis();
     }
 
-    /* ======= Filtros ======= */
+    private void refreshKpis() {
+        long movHoy = master.stream().filter(m -> m.localDate != null && m.localDate.equals(LocalDate.now())).count();
+        kpiMovHoy.setText(String.valueOf(movHoy));
+
+        long activos = inventarioActual.stream().filter(item -> item.stock > 0).count();
+        kpiActivos.setText(String.valueOf(activos));
+
+        kpiStockBajo.setText("N/A"); // No se puede calcular sin stock mínimo en la BD
+
+        try {
+            double valorTotal = SuministrosDAO.getValorTotalStock();
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("es", "MX"));
+            kpiValor.setText(currencyFormatter.format(valorTotal));
+        } catch (Exception e) {
+            e.printStackTrace();
+            kpiValor.setText("$0.00");
+        }
+    }
+
     @FXML
     private void applyFilter() {
-        final String t = lower(txtSearch.getText());
-        final String tipo = sel(cbTipo);
-        final String resp = sel(cbResp);
+        final String t = txtSearch.getText().toLowerCase().trim();
+        final String tipo = cbTipo.getSelectionModel().getSelectedItem();
+        final String resp = cbResp.getSelectionModel().getSelectedItem();
         final LocalDate d1 = dpDesde.getValue();
         final LocalDate d2 = dpHasta.getValue();
 
@@ -114,84 +125,59 @@ public class SuministrosController {
                 (t.isEmpty() || m.itemLc.contains(t) || m.detallesLc.contains(t) || m.respLc.contains(t)) &&
                         ("Todos".equals(tipo) || m.tipo.equalsIgnoreCase(tipo)) &&
                         ("Todos".equals(resp) || m.responsable.equalsIgnoreCase(resp)) &&
-                        (between(m.localDate, d1, d2))
+                        (isBetween(m.localDate, d1, d2))
         ));
+        System.out.println("SuministrosController.applyFilter(): filtered tiene " + filtered.size() + " elementos.");
 
         tblMovs.setItems(filtered);
         lblMostrando.setText(filtered.size() + " ítems");
     }
 
-    private static boolean between(LocalDate f, LocalDate d1, LocalDate d2) {
+    private static boolean isBetween(LocalDate f, LocalDate d1, LocalDate d2) {
         if (f == null) return true;
-        boolean ok1 = (d1 == null) || !f.isBefore(d1);
-        boolean ok2 = (d2 == null) || !f.isAfter(d2);
-        return ok1 && ok2;
-    }
-    private static String lower(String s) { return s == null ? "" : s.toLowerCase().trim(); }
-    private static String sel(ComboBox<String> cb) {
-        String s = cb.getSelectionModel().getSelectedItem();
-        return s == null ? "Todos" : s;
+        return (d1 == null || !f.isBefore(d1)) && (d2 == null || !f.isAfter(d2));
     }
 
-    /* ======= KPIs ======= */
-    private void refreshKpis() {
-        long hoy = master.stream().filter(m -> m.fecha.startsWith(LocalDate.now().toString())).count();
-        long activos = 5; // valor dummy
-        long bajos = master.stream().filter(m -> m.tipo.equalsIgnoreCase("Salida")).count(); // ilustrativo
-        String valor = "$3,339.05"; // dummy
+    @FXML private void onEntrada() { showMovimientoDialog(true); }
+    @FXML private void onSalida() { showMovimientoDialog(false); }
 
-        kpiMovHoy.setText(String.valueOf(hoy));
-        kpiActivos.setText(String.valueOf(activos));
-        kpiStockBajo.setText(String.valueOf(bajos));
-        kpiValor.setText(valor);
-    }
+    private void showMovimientoDialog(boolean isEntrada) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/movimiento_dialog.fxml"));
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(isEntrada ? "Registrar Entrada" : "Registrar Salida");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(App.PrimaryStage());
+            Scene scene = new Scene(loader.load());
+            dialogStage.setScene(scene);
 
-    /* ======= Datos de ejemplo ======= */
-    private void seed() {
-        master.setAll(
-                new Mov("2024-10-07 12:10", "Concentrado Ponedoras", "50", "kg", "Salida", "María García",
-                        "Motivo: Consumo Galpón 1 | Lote: 2024-001 | Ubicación: Almacén Principal",
-                        "Anterior: 700 / Actual: 650"),
-                new Mov("2024-10-07 09:40", "Concentrado Ponedoras", "500", "kg", "Entrada", "Juan Pérez",
-                        "Proveedor: Nutri-Aves S.A. | Lote: 2024-001 | Ubicación: Almacén Principal",
-                        "Anterior: 200 / Actual: 700"),
-                new Mov("2024-10-06 17:15", "Vitamina E + Selenio", "1", "L", "Entrada", "Carlos Ruiz",
-                        "Proveedor: VetFarm Corp | MEO: 2024-045 | Ubicación: Almacén Medicamentos",
-                        "Anterior: 5 / Actual: 6"),
-                new Mov("2024-10-05 11:30", "Desinfectante Ambiental", "2", "L", "Salida", "Ana López",
-                        "Desinfección Galpón 3 | Ubicación: Almacén Sanitario",
-                        "Anterior: 25 / Actual: 23"),
-                new Mov("2024-10-04 08:15", "Suplemento Mineral", "25", "kg", "Salida", "Luis Torres",
-                        "Aplicación sanitaria | Ubicación: Almacén Principal",
-                        "Anterior: 30 / Actual: 5")
-        );
-    }
+            MovimientoDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setTipo(isEntrada);
+            controller.setOnSaveCallback(this::refreshData);
 
-    /* ======= DTO simple ======= */
-    public static class Mov {
-        public final String fecha, item, cantidad, unidad, tipo, responsable, detalles, stock;
-        public final String itemLc, detallesLc, respLc;
-        public final LocalDate localDate;
-
-        public Mov(String fecha, String item, String cantidad, String unidad, String tipo,
-                   String responsable, String detalles, String stock) {
-            this.fecha = fecha;
-            this.item = item;
-            this.cantidad = cantidad;
-            this.unidad = unidad;
-            this.tipo = tipo;
-            this.responsable = responsable;
-            this.detalles = detalles;
-            this.stock = stock;
-
-            this.itemLc = item.toLowerCase();
-            this.detallesLc = detalles.toLowerCase();
-            this.respLc = responsable.toLowerCase();
-
-            // intenta parsear yyyy-MM-dd desde el prefijo de fecha
-            LocalDate ld = null;
-            try { ld = LocalDate.parse(fecha.substring(0, 10)); } catch (Exception ignored) {}
-            this.localDate = ld;
+            dialogStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    @FXML private void goDashboard() { App.goTo("/fxml/dashboard_admin.fxml", "SIA Avitech — ADMIN"); }
+    @FXML private void goSupplies() { /* ya estás aquí */ }
+    @FXML private void goHealth() { App.goTo("/fxml/sanidad.fxml", "SIA Avitech — Sanidad"); }
+    @FXML private void goProduction() { App.goTo("/fxml/produccion.fxml", "SIA Avitech — Producción"); }
+    @FXML private void goReports() { App.goTo("/fxml/reportes.fxml", "SIA Avitech — Reportes"); }
+    @FXML private void goAlerts() { App.goTo("/fxml/alertas.fxml", "SIA Avitech — Alertas"); }
+    @FXML private void goAudit() { App.goTo("/fxml/auditoria.fxml", "SIA Avitech — Auditoría"); }
+    @FXML private void goParams() { App.goTo("/fxml/parametros_unidades.fxml", "SIA Avitech — Parámetros"); }
+    @FXML private void goUsers() { App.goTo("/fxml/usuarios.fxml", "SIA Avitech — Usuarios"); }
+    @FXML private void goBackup() { App.goTo("src/main/resources/fxml/respaldos.fxml", "SIA Avitech — Respaldos"); }
+    @FXML private void onExit() { App.goTo("/fxml/login.fxml", "SIA Avitech — Inicio de sesión"); }
+    @FXML private void onVerStock() { App.goTo("/fxml/inventario.fxml", "SIA Avitech — Inventario"); }
+    @FXML private void onMoverStock() { /* flujo mover stock */ }
+    @FXML private void onExportar() { /* export CSV/XLSX */ }
+
+    private void onVerItem(SuministrosDAO.Mov m) {
+        new Alert(Alert.AlertType.INFORMATION, "Ítem: " + m.item).showAndWait();
     }
 }

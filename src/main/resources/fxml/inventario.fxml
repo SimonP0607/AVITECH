@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.avitech.sia.iu.InventarioController">
+
+    <!-- ========== TOP BAR ========== -->
+    <top>
+        <HBox spacing="12" styleClass="topbar">
+            <children>
+                <Label text="AVITECH — SIA" styleClass="topbar-brand"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Button text="↩ Volver a Suministros" onAction="#onVolver" styleClass="ghostBtn"/>
+            </children>
+            <padding><Insets topRightBottomLeft="10"/></padding>
+        </HBox>
+    </top>
+
+    <!-- ========== CONTENT ========== -->
+    <center>
+        <VBox spacing="18" styleClass="content">
+            <children>
+                <Label text="Inventario de Suministros" styleClass="h2"/>
+                <Label text="Stock actual de todos los productos" styleClass="helper"/>
+
+                <TableView fx:id="tblInventario" prefHeight="600">
+                    <columns>
+                        <TableColumn fx:id="colProducto" text="Producto" prefWidth="300"/>
+                        <TableColumn fx:id="colStock" text="Stock Actual" prefWidth="150"/>
+                        <TableColumn fx:id="colUnidad" text="Unidad" prefWidth="100"/>
+                    </columns>
+                </TableView>
+
+            </children>
+            <padding><Insets topRightBottomLeft="16"/></padding>
+        </VBox>
+    </center>
+
+</BorderPane>
